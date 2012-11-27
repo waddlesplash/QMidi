@@ -1,0 +1,5 @@
+*.user
+*-build-*
+*.o
+*.exe
+Makefile*
