@@ -157,7 +157,7 @@ public:
     inline qint32 trackEndTick(int track) { return myTrackEndTicks.value(track); }
     inline QList<int> tracks() { return myTracks; }
 
-    QtMidiEvent* createNoteOffEvent(int track, qint32 tick, int voice, int note, int velocity);
+    QtMidiEvent* createNoteOffEvent(int track, qint32 tick, int voice, int note, int velocity = 64);
     /* velocity here is how fast to stop the note (127=fastest) */
     QtMidiEvent* createNoteOnEvent(int track, qint32 tick, int voice, int note, int velocity);
 

@@ -803,7 +803,9 @@ bool QtMidiFile::load(QString filename)
                     in.getChar(&note);
                     char velocity;
                     in.getChar(&velocity);
-                    createNoteOnEvent(track, tick, channel, note, velocity);
+                    if(velocity != 0)
+                    { createNoteOnEvent(track, tick, channel, note, velocity); }
+                    else { createNoteOffEvent(track, tick, channel, note); }
                     break;
                 }
                 case 0xA0:
