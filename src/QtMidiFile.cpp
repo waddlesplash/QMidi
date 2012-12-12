@@ -32,18 +32,18 @@
 
 QtMidiEvent::QtMidiEvent()
 {
-    myTrackNumber = 0;
+    myTrackNumber = -1;
     myType = Invalid;
-    myVoice = 0;
-    myNote = 0;
-    myVelocity = 0;
-    myAmount = 0;
-    myNumber = 0;
-    myValue = 0;
-    myNumerator = 0;
-    myDenominator = 0;
+    myVoice = -1;
+    myNote = -1;
+    myVelocity = -1;
+    myAmount = -1;
+    myNumber = -1;
+    myValue = -1;
+    myNumerator = -1;
+    myDenominator = -1;
     myData = "";
-    myTick = 0;
+    myTick = -1;
 }
 
 quint32 QtMidiEvent::message()
