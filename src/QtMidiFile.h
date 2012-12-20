@@ -99,7 +99,6 @@ public:
     void setMessage(quint32 data);
 
     inline bool isNoteEvent() { return ((myType == NoteOn) || (myType == NoteOff)); }
-    inline bool isNoteOffEvent() { return ((myType == NoteOff) || ((myType == NoteOn) && (myVelocity == 0))); }
     
 private:
     int myVoice;
