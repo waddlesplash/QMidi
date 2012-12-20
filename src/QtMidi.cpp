@@ -64,23 +64,21 @@ QMap<QString,QString> QtMidi::outDeviceNames()
     snd_seq_t *handle;
 
     err = snd_seq_open(&handle, "hw", SND_SEQ_OPEN_DUPLEX, 0);
-    if (err < 0)
+    if(err < 0)
     { /* Could not open sequencer!! use  snd_strerror(errno)  to get error. */ return ret; }
 
     snd_seq_client_info_alloca(&cinfo);
     snd_seq_client_info_set_client(cinfo, -1);
 
-    while (snd_seq_query_next_client(handle, cinfo) >= 0) {
+    while(snd_seq_query_next_client(handle, cinfo) >= 0) {
         client = snd_seq_client_info_get_client(cinfo);
         snd_seq_port_info_alloca(&pinfo);
         snd_seq_port_info_set_client(pinfo, client);
 
         snd_seq_port_info_set_port(pinfo, -1);
-        while (snd_seq_query_next_port(handle, pinfo) >= 0) {
-            int  cap;
-
-            cap = (SND_SEQ_PORT_CAP_SUBS_WRITE|SND_SEQ_PORT_CAP_WRITE);
-            if ((snd_seq_port_info_get_capability(pinfo) & cap) == cap) {
+        while(snd_seq_query_next_port(handle, pinfo) >= 0) {
+            int cap = (SND_SEQ_PORT_CAP_SUBS_WRITE|SND_SEQ_PORT_CAP_WRITE);
+            if((snd_seq_port_info_get_capability(pinfo) & cap) == cap) {
                 QString port = QString::number(snd_seq_port_info_get_client(pinfo));
                 port += ":" + QString::number(snd_seq_port_info_get_port(pinfo));
                 QString name = snd_seq_client_info_get_name(cinfo);
@@ -98,9 +96,8 @@ bool QtMidi::initMidiOut(QString outDeviceId)
 #if defined(Q_OS_WIN)
     midiOutOpen(&midiOutPtr,outDeviceId.toInt(),0,0,CALLBACK_NULL);
 #elif defined(Q_OS_LINUX)
-    int err;
-    err = snd_seq_open(&midiOutPtr, "default", SND_SEQ_OPEN_OUTPUT, 0);
-    if (err < 0) { return false; }
+    int err = snd_seq_open(&midiOutPtr, "default", SND_SEQ_OPEN_OUTPUT, 0);
+    if(err < 0) { return false; }
     snd_seq_set_client_name(midiOutPtr, "QtMidi");
 
     snd_seq_create_simple_port(midiOutPtr, "Output Port",
@@ -124,7 +121,7 @@ void QtMidi::closeMidiOut()
     int client = l.at(0).toInt();
     int port = l.at(1).toInt();
 
-    snd_seq_disconnect_from(midiOutPtr,0,client,port);
+    snd_seq_disconnect_from(midiOutPtr, 0, client,port);
 #endif
 }
 
@@ -178,13 +175,13 @@ void QtMidi::outSendMsg(qint32 msg)
     snd_midi_event_t* mev;
 
     snd_seq_ev_clear(&ev);
-    snd_seq_ev_set_source(&ev,0);
+    snd_seq_ev_set_source(&ev, 0);
     snd_seq_ev_set_subs(&ev);
     snd_seq_ev_set_direct(&ev);
 
-    snd_midi_event_new(sizeof(msg),&mev);
+    snd_midi_event_new(sizeof(msg), &mev);
     snd_midi_event_resize_buffer(mev, sizeof(msg));
-    snd_midi_event_encode(mev,(unsigned char*)&msg,sizeof(msg),&ev);
+    snd_midi_event_encode(mev,(unsigned char*)&msg, sizeof(msg), &ev);
 
     snd_seq_event_output(midiOutPtr, &ev);
     snd_seq_drain_output(midiOutPtr);
