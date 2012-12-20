@@ -258,13 +258,9 @@ QList<QtMidiEvent*> QtMidiFile::events(int voice)
 
 int QtMidiFile::createTrack()
 {
-    if(myTracks.count() <= 16)
-    {
-        int t = myTracks.count();
-        myTracks.append(t);
-        return t;
-    }
-    return -1;
+    int t = myTracks.count();
+    myTracks.append(t);
+    return t;
 }
 
 void QtMidiFile::removeTrack(int track)
