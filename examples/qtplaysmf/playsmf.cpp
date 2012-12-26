@@ -26,10 +26,10 @@
 */
 
 #include <stdio.h>
-#include <QtMidi.h>
 #include <QThread>
-#include <QDateTime>
+#include <QElapsedTimer>
 #include <QCoreApplication>
+#include <QtMidi.h>
 #include <QtMidiFile.h>
 
 class MidiPlayer : public QThread
@@ -47,18 +47,17 @@ private:
 protected:
     void run()
     {
-        qint64 start_time = QDateTime::currentDateTime().toMSecsSinceEpoch();
+        QElapsedTimer t;
+        t.start();
         QList<QtMidiEvent*> events = midi_file->events();
         foreach(midi_file_event,events)
         {
             if (midi_file_event->type() != QtMidiEvent::Meta)
             {
                 qint64 event_time = midi_file->timeFromTick(midi_file_event->tick()) * 1000;
-                qint64 current_time = QDateTime::currentDateTime().toMSecsSinceEpoch();
 
-                if (current_time - start_time < event_time)
-                {
-                    int waitTime = event_time - (current_time - start_time);
+                qint32 wait_time = event_time - t.elapsed();
+                if(wait_time > 0) {
                     msleep(waitTime);
                 }
                 handleEvent();
