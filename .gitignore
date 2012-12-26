@@ -1,4 +1,4 @@
-*.user
+*.user*
 *-build-*
 *.o
 *.exe
