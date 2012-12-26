@@ -40,8 +40,6 @@ public:
     {
         midi_file = file;
     }
-    ~MidiPlayer()
-    {}
 
 private:
     QtMidiEvent* midi_file_event;
