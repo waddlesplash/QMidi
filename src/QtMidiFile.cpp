@@ -432,15 +432,11 @@ float QtMidiFile::timeFromTick(qint32 tick)
     case PPQ:
     {
         float tempo_event_time = 0.0;
-        long tempo_event_tick = 0;
+        qint32 tempo_event_tick = 0;
         float tempo = 120.0;
 
-        QtMidiEvent* e;
-        int i = 0;
-        while(i<myTempoEvents.size())
+        foreach(QtMidiEvent* e,myTempoEvents)
         {
-            e = myTempoEvents.at(i);
-            i += 1;
             if(e->tick() >= tick) { break; }
             tempo_event_time += (((float)(e->tick() - tempo_event_tick)) / myResolution / (tempo / 60));
             tempo_event_tick = e->tick();
@@ -483,8 +479,7 @@ qint32 QtMidiFile::tickFromTime(float time)
         qint32 tempo_event_tick = 0;
         float tempo = 120.0;
 
-        QtMidiEvent* e;
-        foreach(e,myTempoEvents)
+        foreach(QtMidiEvent* e,myTempoEvents)
         {
             float next_tempo_event_time = tempo_event_time + (((float)(e->tick() - tempo_event_tick)) / myResolution / (tempo / 60));
             if (next_tempo_event_time >= time) break;
