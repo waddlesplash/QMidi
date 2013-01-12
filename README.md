@@ -1,6 +1,6 @@
 # QtMidi
 A simple, cross-platform way to support MIDI. Classes for MIDI Output and MIDI File I/O are supported.
-It uses WinMM on Windows, and ALSA on Linux. No support yet for Mac.
+MIDI output is supported on Windows (via MMsystem), Linux (via ALSA), and Haiku (via libmidi2 - EXPERIMENTAL).
 
 ## MIDI Output
 To output MIDI, simply initialize the `QtMidi` class...
