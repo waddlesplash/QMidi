@@ -1,6 +1,6 @@
 /*
- * qtmidi (QtMidi.h)
- *  Part of QtMidi (http://github.com/waddlesplash/qtmidi).
+ * qmidi (QMidi.h)
+ *  Part of QMidi (http://github.com/waddlesplash/qmidi).
  *
  * Copyright (c) 2012 WaddleSplash
  *

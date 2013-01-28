@@ -1,6 +1,6 @@
 /*
- * qtmidi (QtMidi.cpp)
- *  Part of QtMidi (http://github.com/waddlesplash/qtmidi).
+ * qmidi (QMidi.cpp)
+ *  Part of QMidi (http://github.com/waddlesplash/qmidi).
  *
  * Copyright (c) 2012 WaddleSplash
  *
@@ -24,7 +24,7 @@
  *
 */
 
-#include "QtMidi.h"
+#include "QMidi.h"
 
 #if defined(Q_OS_WIN)
 #   include <windows.h> // MmSystem needs DWORD, etc.

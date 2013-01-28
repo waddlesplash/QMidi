@@ -1,6 +1,6 @@
 /*
- * qtmidi (QtMidiFile.cpp)
- *  Part of QtMidi (http://github.com/waddlesplash/qtmidi).
+ * qmidi (QMidiFile.cpp)
+ *  Part of QMidi (http://github.com/waddlesplash/qmidi).
  *
  * Copyright (c) 2003-2012 by David G. Slomin
  * Copyright (c) 2012 WaddleSplash
@@ -25,7 +25,7 @@
  *
 */
 
-#include "QtMidiFile.h"
+#include "QMidiFile.h"
 
 #include <QFile>
 #include <stdlib.h>

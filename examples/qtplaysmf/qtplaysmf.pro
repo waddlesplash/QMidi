@@ -5,6 +5,6 @@ CONFIG += console
 TEMPLATE = app
 TARGET = qtplaysmf
 
-include(../../src/QtMidi.pri)
+include(../../src/QMidi.pri)
 
 SOURCES += playsmf.cpp

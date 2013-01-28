@@ -29,8 +29,8 @@
 #include <QThread>
 #include <QElapsedTimer>
 #include <QCoreApplication>
-#include <QtMidi.h>
-#include <QtMidiFile.h>
+#include <QMidi.h>
+#include <QMidiFile.h>
 
 class MidiPlayer : public QThread
 {
