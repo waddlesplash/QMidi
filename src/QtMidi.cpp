@@ -46,9 +46,9 @@ BMidiLocalProducer* midiOutLocProd;
 
 // TODO: error reporting
 
-QString QtMidi::myOutDeviceId;
+QString QMidi::myOutDeviceId;
 
-QMap<QString,QString> QtMidi::outDeviceNames()
+QMap<QString,QString> QMidi::outDeviceNames()
 {
     QMap<QString,QString> ret;
 
@@ -109,7 +109,7 @@ QMap<QString,QString> QtMidi::outDeviceNames()
     return ret;
 }
 
-bool QtMidi::initMidiOut(QString outDeviceId)
+bool QMidi::initMidiOut(QString outDeviceId)
 {
 #if defined(Q_OS_WIN)
     midiOutOpen(&midiOutPtr,outDeviceId.toInt(),0,0,CALLBACK_NULL);
@@ -137,7 +137,7 @@ bool QtMidi::initMidiOut(QString outDeviceId)
     return true;
 }
 
-void QtMidi::closeMidiOut()
+void QMidi::closeMidiOut()
 {
 #if defined(Q_OS_WIN)
     midiOutClose(midiOutPtr);
@@ -155,48 +155,7 @@ void QtMidi::closeMidiOut()
 #endif
 }
 
-void QtMidi::outSetInstr(int voice, int instr)
-{
-    qint32 msg = 0x0000C0 + voice;
-    msg |= instr<<8;
-    outSendMsg(msg);
-}
-
-void QtMidi::outNoteOn(int note, int voice, int velocity)
-{
-    qint32 msg = 0x90 + voice;
-    msg |= note<<8;
-    msg |= velocity<<16;
-    outSendMsg(msg);
-}
-
-void QtMidi::outNoteOff(int note, int voice)
-{
-    qint32 msg = 0x80 + voice;
-    msg |= note<<8;
-    outSendMsg(msg);
-}
-
-void QtMidi::outPitchWheel(int voice, int value)
-{
-    qint32 msg = 0xE0 + voice;
-    msg |= (value & 0x7F)<<8; // fine adjustment
-    msg |= (value / 128)<<16; // coarse adjustment
-    outSendMsg(msg);
-}
-
-void QtMidi::outStopAll()
-{
-    for(int i = 0;i<16;i++)
-    { outStopAll(i); }
-}
-
-void QtMidi::outStopAll(int voice)
-{
-    outSendMsg((0xB0 | voice) | (0x7B<<8));
-}
-
-void QtMidi::outSendMsg(qint32 msg)
+void QMidi::outSendMsg(qint32 msg)
 {
 #if defined(Q_OS_WIN)
     midiOutShortMsg(midiOutPtr,(DWORD)msg);
@@ -216,6 +175,47 @@ void QtMidi::outSendMsg(qint32 msg)
     snd_seq_event_output(midiOutPtr, &ev);
     snd_seq_drain_output(midiOutPtr);
 #elif defined(Q_OS_HAIKU)
-	midiOutLocProd->SprayData((void*)&msg,sizeof(msg),true);
+    midiOutLocProd->SprayData((void*)&msg,sizeof(msg),true);
 #endif
+}
+
+void QMidi::outSetInstr(int voice, int instr)
+{
+    qint32 msg = 0x0000C0 + voice;
+    msg |= instr<<8;
+    outSendMsg(msg);
+}
+
+void QMidi::outNoteOn(int note, int voice, int velocity)
+{
+    qint32 msg = 0x90 + voice;
+    msg |= note<<8;
+    msg |= velocity<<16;
+    outSendMsg(msg);
+}
+
+void QMidi::outNoteOff(int note, int voice)
+{
+    qint32 msg = 0x80 + voice;
+    msg |= note<<8;
+    outSendMsg(msg);
+}
+
+void QMidi::outPitchWheel(int voice, int value)
+{
+    qint32 msg = 0xE0 + voice;
+    msg |= (value & 0x7F)<<8; // fine adjustment
+    msg |= (value / 128)<<16; // coarse adjustment
+    outSendMsg(msg);
+}
+
+void QMidi::outStopAll()
+{
+    for(int i = 0;i<16;i++)
+    { outStopAll(i); }
+}
+
+void QMidi::outStopAll(int voice)
+{
+    outSendMsg((0xB0 | voice) | (0x7B<<8));
 }

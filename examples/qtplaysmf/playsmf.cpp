@@ -36,46 +36,44 @@ class MidiPlayer : public QThread
 {
     Q_OBJECT
 public:
-    MidiPlayer(QtMidiFile* file)
-    {
-        midi_file = file;
-    }
+    MidiPlayer(QMidiFile* file)
+    { midi_file = file; }
 
 private:
-    QtMidiEvent* midi_file_event;
-    QtMidiFile* midi_file;
+    QMidiEvent* midi_file_event;
+    QMidiFile* midi_file;
 protected:
     void run()
     {
         QElapsedTimer t;
         t.start();
-        QList<QtMidiEvent*> events = midi_file->events();
+        QList<QMidiEvent*> events = midi_file->events();
         foreach(midi_file_event,events)
         {
-            if (midi_file_event->type() != QtMidiEvent::Meta)
+            if (midi_file_event->type() != QMidiEvent::Meta)
             {
                 qint64 event_time = midi_file->timeFromTick(midi_file_event->tick()) * 1000;
 
-                qint32 wait_time = event_time - t.elapsed();
-                if(wait_time > 0) {
+                qint32 waitTime = event_time - t.elapsed();
+                if(waitTime > 0) {
                     msleep(waitTime);
                 }
                 handleEvent();
             }
         }
 
-        QtMidi::closeMidiOut();
+        QMidi::closeMidiOut();
     }
 private slots:
     void handleEvent()
     {
-        if (midi_file_event->type() == QtMidiEvent::SysEx)
+        if (midi_file_event->type() == QMidiEvent::SysEx)
         { // TODO: sysex
         }
         else
         {
             qint32 message = midi_file_event->message();
-            QtMidi::outSendMsg(message);
+            QMidi::outSendMsg(message);
         }
     }
 };
@@ -84,7 +82,7 @@ static void usage(char *program_name)
 {
     fprintf(stderr, "Usage: %s -p<port> <MidiFile>\n\n", program_name);
     fprintf(stderr, "Ports:\nID	Name\n----------------\n");
-    QMap<QString,QString> vals = QtMidi::outDeviceNames();
+    QMap<QString,QString> vals = QMidi::outDeviceNames();
     foreach(QString key,vals.keys())
     {
         QString value = vals.value(key);
@@ -102,7 +100,7 @@ int main(int argc, char *argv[])
 
     QString filename = "";
     QString midiOutName = "";
-    QtMidiFile* midi_file = new QtMidiFile();
+    QMidiFile* midi_file = new QMidiFile();
 
     for(int i = 1; i < argc; i++)
     {
@@ -125,7 +123,7 @@ int main(int argc, char *argv[])
     }
     midi_file->load(filename);
 
-    QtMidi::initMidiOut(midiOutName);
+    QMidi::initMidiOut(midiOutName);
 
     MidiPlayer* p = new MidiPlayer(midi_file);
     QObject::connect(p,SIGNAL(finished()),&a,SLOT(quit()));

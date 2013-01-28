@@ -24,20 +24,21 @@
  *
 */
 
-#ifndef MIDIOUT_H
-#define MIDIOUT_H
+#ifndef QMIDI_H
+#define QMIDI_H
 
 #include <QObject>
 #include <QMap>
 #include <QString>
 
-class QtMidi : public QObject
+class QMidi : public QObject
 {
     Q_OBJECT
 public:
     static QMap<QString, QString> outDeviceNames();
     static bool initMidiOut(QString outDeviceId);
     static void closeMidiOut();
+    static void outSendMsg(qint32 msg);
 
     static void outSetInstr(int voice, int instr);
     static void outNoteOn(int note, int voice, int velocity = 64);
@@ -45,7 +46,6 @@ public:
     static void outPitchWheel(int voice, int value);
     static void outStopAll();
     static void outStopAll(int voice);
-    static void outSendMsg(qint32 msg);
 
 signals:
     void allNotesStopped(int voice);
@@ -54,4 +54,4 @@ private:
     static QString myOutDeviceId;
 };
 
-#endif // MIDIOUT_H
+#endif // QMIDI_H

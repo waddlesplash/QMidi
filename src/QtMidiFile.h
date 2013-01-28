@@ -25,14 +25,14 @@
  *
 */
 
-#ifndef QTMIDIFILE_H
-#define QTMIDIFILE_H
+#ifndef QMIDIFILE_H
+#define QMIDIFILE_H
 
 #include <QString>
-#include <QMultiMap>
+#include <QMap>
 #include <QList>
 
-class QtMidiEvent
+class QMidiEvent
 {
 public:
     enum EventType {
@@ -52,8 +52,8 @@ public:
         SysEx
     };
     
-    QtMidiEvent();
-    inline ~QtMidiEvent() {}
+    QMidiEvent();
+    inline ~QMidiEvent() {}
     
     inline EventType type() { return myType; }
     inline void setType(EventType newType) { myType = newType; }
@@ -116,7 +116,7 @@ private:
     int myTrackNumber;
 };
 
-class QtMidiFile
+class QMidiFile
 {
 public:
     enum DivisionType {
@@ -130,8 +130,8 @@ public:
         SMPTE30 = -30
     };
 
-    QtMidiFile();
-    inline ~QtMidiFile() {}
+    QMidiFile();
+    inline ~QMidiFile() {}
 
     bool load(QString filename);
     bool save(QString filename);
@@ -147,8 +147,8 @@ public:
     inline void setDivisionType(DivisionType type) { myDivType = type; }
     inline DivisionType divisionType() { return myDivType; }
 
-    void addEvent(qint32 tick, QtMidiEvent* e);
-    void removeEvent(QtMidiEvent* e);
+    void addEvent(qint32 tick, QMidiEvent* e);
+    void removeEvent(QMidiEvent* e);
 
     int createTrack();
     void removeTrack(int track);
@@ -156,30 +156,30 @@ public:
     inline qint32 trackEndTick(int track) { return myTrackEndTicks.value(track); }
     inline QList<int> tracks() { return myTracks; }
 
-    QtMidiEvent* createNoteOffEvent(int track, qint32 tick, int voice, int note, int velocity = 64);
+    QMidiEvent* createNoteOffEvent(int track, qint32 tick, int voice, int note, int velocity = 64);
     /* velocity here is how fast to stop the note (127=fastest) */
-    QtMidiEvent* createNoteOnEvent(int track, qint32 tick, int voice, int note, int velocity);
+    QMidiEvent* createNoteOnEvent(int track, qint32 tick, int voice, int note, int velocity);
 
-    inline QtMidiEvent* createNote(int track, qint32 start_tick, qint32 end_tick, int voice, int note, int start_velocity, int end_velocity)
+    inline QMidiEvent* createNote(int track, qint32 start_tick, qint32 end_tick, int voice, int note, int start_velocity, int end_velocity)
     { createNoteOffEvent(track,end_tick,voice,note,end_velocity); return createNoteOnEvent(track,start_tick,voice,note,start_velocity); }
     /* returns the start event */
 
-    QtMidiEvent* createKeyPressureEvent(int track, qint32 tick, int voice, int note, int amount);
-    QtMidiEvent* createChannelPressureEvent(int track, qint32 tick, int voice, int amount);
-    QtMidiEvent* createControlChangeEvent(int track, qint32 tick, int voice, int number, int value);
-    QtMidiEvent* createProgramChangeEvent(int track, qint32 tick, int voice, int number);
-    QtMidiEvent* createPitchWheelEvent(int track, qint32 tick, int voice, int value);
-    QtMidiEvent* createSysexEvent(int track, qint32 tick, QByteArray data);
-    QtMidiEvent* createMetaEvent(int track, qint32 tick, int number, QByteArray data);
-    QtMidiEvent* createTempoEvent(int track, qint32 tick, float tempo); /* tempo is in BPM */
-    QtMidiEvent* createTimeSignatureEvent(int track, qint32 tick, int numerator, int denominator);
-    QtMidiEvent* createLyricEvent(int track, qint32 tick, QByteArray text);
-    QtMidiEvent* createMarkerEvent(int track, qint32 tick, QByteArray text);
-    QtMidiEvent* createVoiceEvent(int track, qint32 tick, quint32 data);
+    QMidiEvent* createKeyPressureEvent(int track, qint32 tick, int voice, int note, int amount);
+    QMidiEvent* createChannelPressureEvent(int track, qint32 tick, int voice, int amount);
+    QMidiEvent* createControlChangeEvent(int track, qint32 tick, int voice, int number, int value);
+    QMidiEvent* createProgramChangeEvent(int track, qint32 tick, int voice, int number);
+    QMidiEvent* createPitchWheelEvent(int track, qint32 tick, int voice, int value);
+    QMidiEvent* createSysexEvent(int track, qint32 tick, QByteArray data);
+    QMidiEvent* createMetaEvent(int track, qint32 tick, int number, QByteArray data);
+    QMidiEvent* createTempoEvent(int track, qint32 tick, float tempo); /* tempo is in BPM */
+    QMidiEvent* createTimeSignatureEvent(int track, qint32 tick, int numerator, int denominator);
+    QMidiEvent* createLyricEvent(int track, qint32 tick, QByteArray text);
+    QMidiEvent* createMarkerEvent(int track, qint32 tick, QByteArray text);
+    QMidiEvent* createVoiceEvent(int track, qint32 tick, quint32 data);
 
-    inline QList<QtMidiEvent*> events() { return myEvents; }
-    QList<QtMidiEvent*> events(int voice);
-    QList<QtMidiEvent*> eventsForTrack(int track);
+    inline QList<QMidiEvent*> events() { return myEvents; }
+    QList<QMidiEvent*> events(int voice);
+    QList<QMidiEvent*> eventsForTrack(int track);
 
     float timeFromTick(qint32 tick); /* time is in seconds */
     qint32 tickFromTime(float time);
@@ -187,8 +187,8 @@ public:
     qint32 tickFromBeat(float beat);
 
 private:
-    QList<QtMidiEvent*> myEvents;
-    QList<QtMidiEvent*> myTempoEvents;
+    QList<QMidiEvent*> myEvents;
+    QList<QMidiEvent*> myTempoEvents;
     QList<int> myTracks;
     QMap<qint16,qint32> myTrackEndTicks;
     DivisionType myDivType;

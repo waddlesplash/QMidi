@@ -30,7 +30,7 @@
 #include <QFile>
 #include <stdlib.h>
 
-QtMidiEvent::QtMidiEvent()
+QMidiEvent::QMidiEvent()
 {
     myTrackNumber = -1;
     myType = Invalid;
@@ -46,7 +46,7 @@ QtMidiEvent::QtMidiEvent()
     myTick = -1;
 }
 
-quint32 QtMidiEvent::message()
+quint32 QMidiEvent::message()
 {
     union
     {
@@ -112,7 +112,7 @@ quint32 QtMidiEvent::message()
     return u.data_as_uint32;
 }
 
-void QtMidiEvent::setMessage(quint32 data)
+void QMidiEvent::setMessage(quint32 data)
 {
     union
     {
@@ -180,7 +180,7 @@ void QtMidiEvent::setMessage(quint32 data)
     }
 }
 
-float QtMidiEvent::tempo()
+float QMidiEvent::tempo()
 {
     unsigned char* buffer;
     qint32 midi_tempo = 0;
@@ -194,14 +194,14 @@ float QtMidiEvent::tempo()
 
 /* End of QtMidiEvent functions, on to QtMidiFile */
 
-QtMidiFile::QtMidiFile()
+QMidiFile::QMidiFile()
 {
     myDivType = PPQ;
     myFileFormat = 0;
     myResolution = 0;
 }
 
-bool isGreaterThan(QtMidiEvent* e1,QtMidiEvent* e2)
+bool isGreaterThan(QMidiEvent* e1,QMidiEvent* e2)
 {
     qint32 e1t = e1->tick();
     qint32 e2t = e2->tick();
@@ -209,33 +209,33 @@ bool isGreaterThan(QtMidiEvent* e1,QtMidiEvent* e2)
     else { return false; }
 }
 
-void QtMidiFile::sort()
+void QMidiFile::sort()
 {
     qStableSort(myEvents.begin(),myEvents.end(),isGreaterThan);
     qStableSort(myTempoEvents.begin(),myTempoEvents.end(),isGreaterThan);
 }
 
-void QtMidiFile::addEvent(qint32 tick, QtMidiEvent* e)
+void QMidiFile::addEvent(qint32 tick, QMidiEvent* e)
 {
     e->setTick(tick);
     myEvents.append(e);
     if(!disableSort) { sort(); }
-    if((e->track() == 0) && (e->type() == QtMidiEvent::Meta_Tempo))
+    if((e->track() == 0) && (e->type() == QMidiEvent::Meta_Tempo))
     {
         myTempoEvents.append(e);
     }
 }
-void QtMidiFile::removeEvent(QtMidiEvent* e)
+void QMidiFile::removeEvent(QMidiEvent* e)
 {
     myEvents.removeOne(e);
-    if((e->track() == 0) && (e->type() == QtMidiEvent::Meta_Tempo))
+    if((e->track() == 0) && (e->type() == QMidiEvent::Meta_Tempo))
     { myTempoEvents.removeOne(e); }
 }
 
-QList<QtMidiEvent*> QtMidiFile::eventsForTrack(int track)
+QList<QMidiEvent*> QMidiFile::eventsForTrack(int track)
 {
-    QList<QtMidiEvent*> ret;
-    QtMidiEvent* e;
+    QList<QMidiEvent*> ret;
+    QMidiEvent* e;
     foreach(e,myEvents)
     {
         if(e->track() == track)
@@ -244,10 +244,10 @@ QList<QtMidiEvent*> QtMidiFile::eventsForTrack(int track)
     return ret;
 }
 
-QList<QtMidiEvent*> QtMidiFile::events(int voice)
+QList<QMidiEvent*> QMidiFile::events(int voice)
 {
-    QList<QtMidiEvent*> ret;
-    QtMidiEvent* e;
+    QList<QMidiEvent*> ret;
+    QMidiEvent* e;
     foreach(e,myEvents)
     {
         if(e->voice() == voice)
@@ -256,23 +256,23 @@ QList<QtMidiEvent*> QtMidiFile::events(int voice)
     return ret;
 }
 
-int QtMidiFile::createTrack()
+int QMidiFile::createTrack()
 {
     int t = myTracks.count();
     myTracks.append(t);
     return t;
 }
 
-void QtMidiFile::removeTrack(int track)
+void QMidiFile::removeTrack(int track)
 {
     if(myTracks.contains(track))
     { myTracks.removeOne(track); }
 }
 
-QtMidiEvent* QtMidiFile::createNoteOffEvent(int track, qint32 tick, int voice, int note, int velocity)
+QMidiEvent* QMidiFile::createNoteOffEvent(int track, qint32 tick, int voice, int note, int velocity)
 {
-    QtMidiEvent* e = new QtMidiEvent();
-    e->setType(QtMidiEvent::NoteOff);
+    QMidiEvent* e = new QMidiEvent();
+    e->setType(QMidiEvent::NoteOff);
     e->setTrack(track);
     e->setVoice(voice);
     e->setNote(note);
@@ -280,10 +280,10 @@ QtMidiEvent* QtMidiFile::createNoteOffEvent(int track, qint32 tick, int voice, i
     addEvent(tick,e);
     return e;
 }
-QtMidiEvent* QtMidiFile::createNoteOnEvent(int track, qint32 tick, int voice, int note, int velocity)
+QMidiEvent* QMidiFile::createNoteOnEvent(int track, qint32 tick, int voice, int note, int velocity)
 {
-    QtMidiEvent* e = new QtMidiEvent();
-    e->setType(QtMidiEvent::NoteOn);
+    QMidiEvent* e = new QMidiEvent();
+    e->setType(QMidiEvent::NoteOn);
     e->setTrack(track);
     e->setVoice(voice);
     e->setNote(note);
@@ -291,10 +291,10 @@ QtMidiEvent* QtMidiFile::createNoteOnEvent(int track, qint32 tick, int voice, in
     addEvent(tick,e);
     return e;
 }
-QtMidiEvent* QtMidiFile::createKeyPressureEvent(int track, qint32 tick, int voice, int note, int amount)
+QMidiEvent* QMidiFile::createKeyPressureEvent(int track, qint32 tick, int voice, int note, int amount)
 {
-    QtMidiEvent* e = new QtMidiEvent();
-    e->setType(QtMidiEvent::KeyPressure);
+    QMidiEvent* e = new QMidiEvent();
+    e->setType(QMidiEvent::KeyPressure);
     e->setTrack(track);
     e->setVoice(voice);
     e->setNote(note);
@@ -302,20 +302,20 @@ QtMidiEvent* QtMidiFile::createKeyPressureEvent(int track, qint32 tick, int voic
     addEvent(tick,e);
     return e;
 }
-QtMidiEvent* QtMidiFile::createChannelPressureEvent(int track, qint32 tick, int voice, int amount)
+QMidiEvent* QMidiFile::createChannelPressureEvent(int track, qint32 tick, int voice, int amount)
 {
-    QtMidiEvent* e = new QtMidiEvent();
-    e->setType(QtMidiEvent::ChannelPressure);
+    QMidiEvent* e = new QMidiEvent();
+    e->setType(QMidiEvent::ChannelPressure);
     e->setTrack(track);
     e->setVoice(voice);
     e->setAmount(amount);
     addEvent(tick,e);
     return e;
 }
-QtMidiEvent* QtMidiFile::createControlChangeEvent(int track, qint32 tick, int voice, int number, int value)
+QMidiEvent* QMidiFile::createControlChangeEvent(int track, qint32 tick, int voice, int number, int value)
 {
-    QtMidiEvent* e = new QtMidiEvent();
-    e->setType(QtMidiEvent::ControlChange);
+    QMidiEvent* e = new QMidiEvent();
+    e->setType(QMidiEvent::ControlChange);
     e->setTrack(track);
     e->setVoice(voice);
     e->setNumber(number);
@@ -323,54 +323,54 @@ QtMidiEvent* QtMidiFile::createControlChangeEvent(int track, qint32 tick, int vo
     addEvent(tick,e);
     return e;
 }
-QtMidiEvent* QtMidiFile::createProgramChangeEvent(int track, qint32 tick, int voice, int number)
+QMidiEvent* QMidiFile::createProgramChangeEvent(int track, qint32 tick, int voice, int number)
 {
-    QtMidiEvent* e = new QtMidiEvent();
-    e->setType(QtMidiEvent::ProgramChange);
+    QMidiEvent* e = new QMidiEvent();
+    e->setType(QMidiEvent::ProgramChange);
     e->setTrack(track);
     e->setVoice(voice);
     e->setNumber(number);
     addEvent(tick,e);
     return e;
 }
-QtMidiEvent* QtMidiFile::createPitchWheelEvent(int track, qint32 tick, int voice, int value)
+QMidiEvent* QMidiFile::createPitchWheelEvent(int track, qint32 tick, int voice, int value)
 {
-    QtMidiEvent* e = new QtMidiEvent();
-    e->setType(QtMidiEvent::PitchWheel);
+    QMidiEvent* e = new QMidiEvent();
+    e->setType(QMidiEvent::PitchWheel);
     e->setTrack(track);
     e->setVoice(voice);
     e->setValue(value);
     addEvent(tick,e);
     return e;
 }
-QtMidiEvent* QtMidiFile::createSysexEvent(int track, qint32 tick, QByteArray data)
+QMidiEvent* QMidiFile::createSysexEvent(int track, qint32 tick, QByteArray data)
 {
-    QtMidiEvent* e = new QtMidiEvent();
-    e->setType(QtMidiEvent::SysEx);
+    QMidiEvent* e = new QMidiEvent();
+    e->setType(QMidiEvent::SysEx);
     e->setTrack(track);
     e->setData(data);
     addEvent(tick,e);
     return e;
 }
-QtMidiEvent* QtMidiFile::createMetaEvent(int track, qint32 tick, int number, QByteArray data)
+QMidiEvent* QMidiFile::createMetaEvent(int track, qint32 tick, int number, QByteArray data)
 {
-    QtMidiEvent* e = new QtMidiEvent();
+    QMidiEvent* e = new QMidiEvent();
     switch(number)
     {
     case 0x51:
-        e->setType(QtMidiEvent::Meta_Tempo);
+        e->setType(QMidiEvent::Meta_Tempo);
         break;
     case 0x58:
-        e->setType(QtMidiEvent::Meta_TimeSignature);
+        e->setType(QMidiEvent::Meta_TimeSignature);
         break;
     case 0x5:
-        e->setType(QtMidiEvent::Meta_Lyric);
+        e->setType(QMidiEvent::Meta_Lyric);
         break;
     case 0x6:
-        e->setType(QtMidiEvent::Meta_Marker);
+        e->setType(QMidiEvent::Meta_Marker);
         break;
     default:
-        e->setType(QtMidiEvent::Meta);
+        e->setType(QMidiEvent::Meta);
         break;
     }
     e->setTrack(track);
@@ -379,7 +379,7 @@ QtMidiEvent* QtMidiFile::createMetaEvent(int track, qint32 tick, int number, QBy
     addEvent(tick,e);
     return e;
 }
-QtMidiEvent* QtMidiFile::createTempoEvent(int track, qint32 tick, float tempo)
+QMidiEvent* QMidiFile::createTempoEvent(int track, qint32 tick, float tempo)
 {
     long midi_tempo = 60000000L / tempo;
     QByteArray buffer;
@@ -388,44 +388,44 @@ QtMidiEvent* QtMidiFile::createTempoEvent(int track, qint32 tick, float tempo)
     buffer[2] = midi_tempo & 0xFF;
     return createMetaEvent(track, tick, 0x51, buffer);
 }
-QtMidiEvent* QtMidiFile::createTimeSignatureEvent(int track, qint32 tick, int numerator, int denominator)
+QMidiEvent* QMidiFile::createTimeSignatureEvent(int track, qint32 tick, int numerator, int denominator)
 {
-    QtMidiEvent* e = new QtMidiEvent();
-    e->setType(QtMidiEvent::Meta_TimeSignature);
+    QMidiEvent* e = new QMidiEvent();
+    e->setType(QMidiEvent::Meta_TimeSignature);
     e->setTrack(track);
     e->setNumerator(numerator);
     e->setDenominator(denominator);
     addEvent(tick,e);
     return e;
 }
-QtMidiEvent* QtMidiFile::createLyricEvent(int track, qint32 tick, QByteArray text)
+QMidiEvent* QMidiFile::createLyricEvent(int track, qint32 tick, QByteArray text)
 {
-    QtMidiEvent* e = new QtMidiEvent();
-    e->setType(QtMidiEvent::Meta_Lyric);
+    QMidiEvent* e = new QMidiEvent();
+    e->setType(QMidiEvent::Meta_Lyric);
     e->setTrack(track);
     e->setData(text);
     addEvent(tick,e);
     return e;
 }
-QtMidiEvent* QtMidiFile::createMarkerEvent(int track, qint32 tick, QByteArray text)
+QMidiEvent* QMidiFile::createMarkerEvent(int track, qint32 tick, QByteArray text)
 {
-    QtMidiEvent* e = new QtMidiEvent();
-    e->setType(QtMidiEvent::Meta_Marker);
+    QMidiEvent* e = new QMidiEvent();
+    e->setType(QMidiEvent::Meta_Marker);
     e->setTrack(track);
     e->setData(text);
     addEvent(tick,e);
     return e;
 }
-QtMidiEvent* QtMidiFile::createVoiceEvent(int track, qint32 tick, quint32 data)
+QMidiEvent* QMidiFile::createVoiceEvent(int track, qint32 tick, quint32 data)
 {
-    QtMidiEvent* e = new QtMidiEvent();
+    QMidiEvent* e = new QMidiEvent();
     e->setTrack(track);
     e->setMessage(data);
     addEvent(tick,e);
     return e;
 }
 
-float QtMidiFile::timeFromTick(qint32 tick)
+float QMidiFile::timeFromTick(qint32 tick)
 {
     switch(myDivType)
     {
@@ -435,7 +435,7 @@ float QtMidiFile::timeFromTick(qint32 tick)
         qint32 tempo_event_tick = 0;
         float tempo = 120.0;
 
-        foreach(QtMidiEvent* e,myTempoEvents)
+        foreach(QMidiEvent* e,myTempoEvents)
         {
             if(e->tick() >= tick) { break; }
             tempo_event_time += (((float)(e->tick() - tempo_event_tick)) / myResolution / (tempo / 60));
@@ -469,7 +469,7 @@ float QtMidiFile::timeFromTick(qint32 tick)
     }
 }
 
-qint32 QtMidiFile::tickFromTime(float time)
+qint32 QMidiFile::tickFromTime(float time)
 {
     switch(myDivType)
     {
@@ -479,7 +479,7 @@ qint32 QtMidiFile::tickFromTime(float time)
         qint32 tempo_event_tick = 0;
         float tempo = 120.0;
 
-        foreach(QtMidiEvent* e,myTempoEvents)
+        foreach(QMidiEvent* e,myTempoEvents)
         {
             float next_tempo_event_time = tempo_event_time + (((float)(e->tick() - tempo_event_tick)) / myResolution / (tempo / 60));
             if (next_tempo_event_time >= time) break;
@@ -513,7 +513,7 @@ qint32 QtMidiFile::tickFromTime(float time)
     }
 }
 
-float QtMidiFile::beatFromTick(qint32 tick)
+float QMidiFile::beatFromTick(qint32 tick)
 {
     switch(myDivType)
     {
@@ -544,7 +544,7 @@ float QtMidiFile::beatFromTick(qint32 tick)
     }
 }
 
-qint32 QtMidiFile::tickFromBeat(float beat)
+qint32 QMidiFile::tickFromBeat(float beat)
 {
     switch(myDivType)
     {
@@ -648,7 +648,7 @@ void write_variable_length_quantity(QFile *out, quint32 value)
     out->write((char*)buffer+offset,4-offset);
 }
 
-bool QtMidiFile::load(QString filename)
+bool QMidiFile::load(QString filename)
 {
     QFile in(filename);
 
@@ -899,7 +899,7 @@ bool QtMidiFile::load(QString filename)
     return true;
 }
 
-bool QtMidiFile::save(QString filename)
+bool QMidiFile::save(QString filename)
 {
     QFile out(filename);
     int curTrack;
@@ -924,7 +924,7 @@ bool QtMidiFile::save(QString filename)
     }
 
     foreach(curTrack,myTracks) {
-        QtMidiEvent* e;
+        QMidiEvent* e;
         qint32 track_size_offset, track_start_offset, track_end_offset, tick, previous_tick;
 
         out.write("MTrk",4);
@@ -936,47 +936,47 @@ bool QtMidiFile::save(QString filename)
 
         previous_tick = 0;
 
-        QList<QtMidiEvent*> eventsForTrk = eventsForTrack(curTrack);
+        QList<QMidiEvent*> eventsForTrk = eventsForTrack(curTrack);
         foreach(e,eventsForTrk) {
             tick = e->tick();
             write_variable_length_quantity(&out, tick - previous_tick);
 
             switch(e->type()) {
-            case QtMidiEvent::NoteOff:
+            case QMidiEvent::NoteOff:
                 out.putChar(0x80 | (e->voice() & 0x0F));
                 out.putChar(e->note() & 0x7F);
                 out.putChar(e->velocity() & 0x7F);
                 break;
 
-            case QtMidiEvent::NoteOn:
+            case QMidiEvent::NoteOn:
                 out.putChar(0x90 | (e->voice() & 0x0F));
                 out.putChar(e->note() & 0x7F);
                 out.putChar(e->velocity() & 0x7F);
                 break;
 
-            case QtMidiEvent::KeyPressure:
+            case QMidiEvent::KeyPressure:
                 out.putChar(0xA0 | (e->voice() & 0x0F));
                 out.putChar(e->note() & 0x7F);
                 out.putChar(e->amount() & 0x7F);
                 break;
 
-            case QtMidiEvent::ControlChange:
+            case QMidiEvent::ControlChange:
                 out.putChar(0xB0 | (e->voice() & 0x0F));
                 out.putChar(e->number() & 0x7F);
                 out.putChar(e->value() & 0x7F);
                 break;
 
-            case QtMidiEvent::ProgramChange:
+            case QMidiEvent::ProgramChange:
                 out.putChar(0xC0 | (e->voice() & 0x0F));
                 out.putChar(e->number() & 0x7F);
                 break;
 
-            case QtMidiEvent::ChannelPressure:
+            case QMidiEvent::ChannelPressure:
                 out.putChar(0xD0 | (e->voice() & 0x0F));
                 out.putChar(e->value() & 0x7F);
                 break;
 
-            case QtMidiEvent::PitchWheel:
+            case QMidiEvent::PitchWheel:
             {
                 int value = e->value();
                 out.putChar(0xE0 | (e->voice() & 0x0F));
@@ -984,7 +984,7 @@ bool QtMidiFile::save(QString filename)
                 out.putChar((value >> 7) & 0x7F);
                 break;
             }
-            case QtMidiEvent::SysEx:
+            case QMidiEvent::SysEx:
             {
                 int data_length = e->data().size();
                 unsigned char* data = (unsigned char*)e->data().constData();
@@ -993,11 +993,11 @@ bool QtMidiFile::save(QString filename)
                 out.write((char*)data+1,data_length-1);
                 break;
             }
-            case QtMidiEvent::Meta:
-            case QtMidiEvent::Meta_Lyric:
-            case QtMidiEvent::Meta_Tempo:
-            case QtMidiEvent::Meta_Marker:
-            case QtMidiEvent::Meta_TimeSignature:
+            case QMidiEvent::Meta:
+            case QMidiEvent::Meta_Lyric:
+            case QMidiEvent::Meta_Tempo:
+            case QMidiEvent::Meta_Marker:
+            case QMidiEvent::Meta_TimeSignature:
             {
                 int data_length = e->data().size();
                 unsigned char *data = (unsigned char*)e->data().constData();
