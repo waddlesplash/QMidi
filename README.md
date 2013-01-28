@@ -1,9 +1,9 @@
 # QMidi
 A simple, cross-platform way to support MIDI. Classes for MIDI Output and MIDI File I/O are supported.
-MIDI output is supported on Windows (via MMsystem), Linux (via ALSA), and Haiku (via libmidi2 - EXPERIMENTAL).
+MIDI output is supported on Windows (via `mmsystem`), Linux (via `ALSA`), and Haiku (via `libmidi2` - EXPERIMENTAL).
 
 ## MIDI Output
-To output MIDI, simply initialize the `QtMidi` class...
+To output MIDI, simply initialize the `QMidi` class...
 ```cpp
 QMap<QString,QString> vals = QMidi::outDeviceNames();
 // outDeviceNames() returns a QMap where the key is the ID and
@@ -29,7 +29,7 @@ Before your application closes or if you want to open output on a different port
 QMidi::closeMidiOut();
 ```
 
-As you can see from the examples, all functions in the `QtMidi` class are static and you do not need to create an object.
+As you can see from the examples, all functions in the `QMidi` class are static and you do not need to create an object.
 
 ## MIDI File I/O
 Classes for MIDI file I/O were rewritten from Div's Midi Utilities ([homepage](http://www.sreal.com/~div/midi-utilities/) | [Google Code](http://code.google.com/p/divs-midi-utilities/)) into Qt/C++.
@@ -40,4 +40,4 @@ QMidiFile f;
 f.load(" .. some filename .. ");
 f.save(" .. some filename .. ");
 ```
-You can get the events using `f.events()` which returns a `QList<QtMidiEvent*>`. For information on using these classes in conjuction with the MIDI output class to play files, see the `qtplaysmf` example in the `examples` folder.
+You can get the events using `f.events()` which returns a `QList<QMidiEvent*>`. For information on using these classes in conjuction with the MIDI output class to play files, see the `qtplaysmf` example in the `examples` folder.
