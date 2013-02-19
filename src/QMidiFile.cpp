@@ -1,6 +1,6 @@
 /*
  * qmidi (QMidiFile.cpp)
- *  Part of QMidi (http://github.com/waddlesplash/qmidi).
+ *  Part of QMidi (http://github.com/waddlesplash/qtmidi).
  *
  * Copyright (c) 2003-2012 by David G. Slomin
  * Copyright (c) 2012 WaddleSplash

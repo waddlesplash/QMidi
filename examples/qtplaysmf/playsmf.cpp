@@ -1,5 +1,5 @@
 /*
- * qtmidi (QtMidi.cpp)
+ * QtPlaySMF
  *  Part of QtMidi (http://github.com/waddlesplash/qtmidi).
  *
  * Copyright (c) 2003-2012 by David G. Slomin
