@@ -44,6 +44,7 @@ public:
     static void outNoteOn(int note, int voice, int velocity = 64);
     static void outNoteOff(int note, int voice);
     static void outPitchWheel(int voice, int value);
+    static void outControlChange(int voice, int number, int value);
     static void outStopAll();
     static void outStopAll(int voice);
 

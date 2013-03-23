@@ -209,6 +209,14 @@ void QMidi::outPitchWheel(int voice, int value)
     outSendMsg(msg);
 }
 
+void QMidi::outControlChange(int voice, int number, int value)
+{
+    qint32 msg = 0xB0 + voice;
+    msg |= (number)<<8;
+    msg |= (value)<<16;
+    outSendMsg(msg);
+}
+
 void QMidi::outStopAll()
 {
     for(int i = 0;i<16;i++)
