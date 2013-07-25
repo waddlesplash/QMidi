@@ -157,6 +157,13 @@ void QMidi::closeMidiOut()
 
 void QMidi::outSendMsg(qint32 msg)
 {
+#if !defined(Q_OS_WIN)
+    char buf[3];
+    buf[0] = msg & 0xFF;
+    buf[1] = (msg >> 8) & 0xFF;
+    buf[2] = (msg >> 16) & 0xFF;
+#endif
+  
 #if defined(Q_OS_WIN)
     midiOutShortMsg(midiOutPtr,(DWORD)msg);
 #elif defined(Q_OS_LINUX)
@@ -168,14 +175,14 @@ void QMidi::outSendMsg(qint32 msg)
     snd_seq_ev_set_subs(&ev);
     snd_seq_ev_set_direct(&ev);
 
-    snd_midi_event_new(sizeof(msg), &mev);
-    snd_midi_event_resize_buffer(mev, sizeof(msg));
-    snd_midi_event_encode(mev,(unsigned char*)&msg, sizeof(msg), &ev);
+    snd_midi_event_new(3, &mev);
+    snd_midi_event_resize_buffer(mev, 3);
+    snd_midi_event_encode(mev,(unsigned char*)&buf, 3, &ev);
 
     snd_seq_event_output(midiOutPtr, &ev);
     snd_seq_drain_output(midiOutPtr);
 #elif defined(Q_OS_HAIKU)
-    midiOutLocProd->SprayData((void*)&msg,sizeof(msg),true);
+    midiOutLocProd->SprayData((void*)&buf,3,true);
 #endif
 }
 
