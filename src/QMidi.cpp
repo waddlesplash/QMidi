@@ -93,17 +93,17 @@ QMap<QString,QString> QMidi::outDeviceNames()
         }
     }
 #elif defined(Q_OS_HAIKU)
-	bool OK = true;
-	int32 id = 0;
-	while(OK) {
-		BMidiConsumer* c = BMidiRoster::NextConsumer(&id);
-		if(c != NULL) {
-			ret.insert(QString::number(id),QString::fromUtf8(c->Name()));
-			c->Release();
-		} else {
-			OK = false;
-		}
-	}
+    bool OK = true;
+    int32 id = 0;
+    while(OK) {
+        BMidiConsumer* c = BMidiRoster::NextConsumer(&id);
+        if(c != NULL) {
+            ret.insert(QString::number(id),QString::fromUtf8(c->Name()));
+            c->Release();
+        } else {
+            OK = false;
+        }
+    }
 #endif
 
     return ret;
@@ -126,12 +126,12 @@ bool QMidi::initMidiOut(QString outDeviceId)
     int port = l.at(1).toInt();
     snd_seq_connect_to(midiOutPtr, 0, client, port);
 #elif defined(Q_OS_HAIKU)
-	midiOutConsumer = BMidiRoster::FindConsumer(outDeviceId.toInt());
-	if(midiOutConsumer == NULL) { return false; }
-	midiOutLocProd = new BMidiLocalProducer("QtMidi");
-	if(!midiOutLocProd->IsValid()) { midiOutLocProd->Release(); return false; } // some error ??
-	midiOutLocProd->Register();
-	if(midiOutLocProd->Connect(midiOutConsumer) != B_OK) { return false; }
+    midiOutConsumer = BMidiRoster::FindConsumer(outDeviceId.toInt());
+    if(midiOutConsumer == NULL) { return false; }
+    midiOutLocProd = new BMidiLocalProducer("QtMidi");
+    if(!midiOutLocProd->IsValid()) { midiOutLocProd->Release(); return false; } // some error ??
+    midiOutLocProd->Register();
+    if(midiOutLocProd->Connect(midiOutConsumer) != B_OK) { return false; }
 #endif
     myOutDeviceId = outDeviceId;
     return true;
@@ -148,10 +148,10 @@ void QMidi::closeMidiOut()
 
     snd_seq_disconnect_from(midiOutPtr, 0, client,port);
 #elif defined(Q_OS_HAIKU)
-	midiOutLocProd->Disconnect(midiOutConsumer);
-	midiOutConsumer->Release();
-	midiOutLocProd->Unregister();
-	midiOutLocProd->Release();
+    midiOutLocProd->Disconnect(midiOutConsumer);
+    midiOutConsumer->Release();
+    midiOutLocProd->Unregister();
+    midiOutLocProd->Release();
 #endif
 }
 
