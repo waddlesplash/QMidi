@@ -3,7 +3,7 @@
  *  Part of QMidi (http://github.com/waddlesplash/qtmidi).
  *
  * Copyright (c) 2003-2012 by David G. Slomin
- * Copyright (c) 2012 WaddleSplash
+ * Copyright (c) 2012-2013 WaddleSplash
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
