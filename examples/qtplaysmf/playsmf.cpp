@@ -29,7 +29,7 @@
 #include <QThread>
 #include <QElapsedTimer>
 #include <QCoreApplication>
-#include <QMidi.h>
+#include <QMidiOut.h>
 #include <QMidiFile.h>
 
 class MidiPlayer : public QThread
@@ -47,9 +47,10 @@ protected:
     {
         QElapsedTimer t;
         t.start();
-        QList<QMidiEvent*> events = midi_file->events();
-        foreach(midi_file_event,events)
+        QList<QMidiEvent*>* events = midi_file->events();
+        for(int i = 0; i < events->count(); i++)
         {
+            QMidiEvent* midi_file_event = events->at(i);
             if (midi_file_event->type() != QMidiEvent::Meta)
             {
                 qint64 event_time = midi_file->timeFromTick(midi_file_event->tick()) * 1000;
@@ -62,7 +63,7 @@ protected:
             }
         }
 
-        QMidi::closeMidiOut();
+        QMidiOut::closeMidiOut();
     }
 private slots:
     void handleEvent()
@@ -73,7 +74,7 @@ private slots:
         else
         {
             qint32 message = midi_file_event->message();
-            QMidi::outSendMsg(message);
+            QMidiOut::outSendMsg(message);
         }
     }
 };
@@ -82,7 +83,7 @@ static void usage(char *program_name)
 {
     fprintf(stderr, "Usage: %s -p<port> <MidiFile>\n\n", program_name);
     fprintf(stderr, "Ports:\nID	Name\n----------------\n");
-    QMap<QString,QString> vals = QMidi::outDeviceNames();
+    QMap<QString,QString> vals = QMidiOut::outDeviceNames();
     foreach(QString key,vals.keys())
     {
         QString value = vals.value(key);
@@ -123,7 +124,7 @@ int main(int argc, char *argv[])
     }
     midi_file->load(filename);
 
-    QMidi::initMidiOut(midiOutName);
+    QMidiOut::initMidiOut(midiOutName);
 
     MidiPlayer* p = new MidiPlayer(midi_file);
     QObject::connect(p,SIGNAL(finished()),&a,SLOT(quit()));

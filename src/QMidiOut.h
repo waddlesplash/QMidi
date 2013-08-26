@@ -24,14 +24,14 @@
  *
 */
 
-#ifndef QMIDI_H
-#define QMIDI_H
+#ifndef QMIDIOUT_H
+#define QMIDIOUT_H
 
 #include <QObject>
 #include <QMap>
 #include <QString>
 
-class QMidi : public QObject
+class QMidiOut : public QObject
 {
     Q_OBJECT
 public:
@@ -55,4 +55,4 @@ private:
     static QString myOutDeviceId;
 };
 
-#endif // QMIDI_H
+#endif // QMIDIOUT_H
