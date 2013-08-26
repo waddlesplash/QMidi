@@ -1,5 +1,5 @@
 *.user*
-*-build-*
+*build-*
 *.o
 *.exe
 Makefile*
