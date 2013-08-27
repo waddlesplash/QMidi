@@ -46,9 +46,9 @@ BMidiLocalProducer* midiOutLocProd;
 
 // TODO: error reporting
 
-QString QMidiOut::myOutDeviceId;
+QString QMidiOut::myDeviceId;
 
-QMap<QString,QString> QMidiOut::outDeviceNames()
+QMap<QString,QString> QMidiOut::devices()
 {
     QMap<QString,QString> ret;
 
@@ -109,7 +109,7 @@ QMap<QString,QString> QMidiOut::outDeviceNames()
     return ret;
 }
 
-bool QMidiOut::initMidiOut(QString outDeviceId)
+bool QMidiOut::connect(QString outDeviceId)
 {
 #if defined(Q_OS_WIN)
     midiOutOpen(&midiOutPtr,outDeviceId.toInt(),0,0,CALLBACK_NULL);
@@ -133,11 +133,11 @@ bool QMidiOut::initMidiOut(QString outDeviceId)
     midiOutLocProd->Register();
     if(midiOutLocProd->Connect(midiOutConsumer) != B_OK) { return false; }
 #endif
-    myOutDeviceId = outDeviceId;
+    myDeviceId = outDeviceId;
     return true;
 }
 
-void QMidiOut::closeMidiOut()
+void QMidiOut::disconnect()
 {
 #if defined(Q_OS_WIN)
     midiOutClose(midiOutPtr);
@@ -155,7 +155,7 @@ void QMidiOut::closeMidiOut()
 #endif
 }
 
-void QMidiOut::outSendMsg(qint32 msg)
+void QMidiOut::sendMsg(qint32 msg)
 {
 #if !defined(Q_OS_WIN)
     char buf[3];
@@ -186,51 +186,51 @@ void QMidiOut::outSendMsg(qint32 msg)
 #endif
 }
 
-void QMidiOut::outSetInstr(int voice, int instr)
+void QMidiOut::setInstr(int voice, int instr)
 {
     qint32 msg = 0x0000C0 + voice;
     msg |= instr<<8;
-    outSendMsg(msg);
+    sendMsg(msg);
 }
 
-void QMidiOut::outNoteOn(int note, int voice, int velocity)
+void QMidiOut::noteOn(int note, int voice, int velocity)
 {
     qint32 msg = 0x90 + voice;
     msg |= note<<8;
     msg |= velocity<<16;
-    outSendMsg(msg);
+    sendMsg(msg);
 }
 
-void QMidiOut::outNoteOff(int note, int voice)
+void QMidiOut::noteOff(int note, int voice)
 {
     qint32 msg = 0x80 + voice;
     msg |= note<<8;
-    outSendMsg(msg);
+    sendMsg(msg);
 }
 
-void QMidiOut::outPitchWheel(int voice, int value)
+void QMidiOut::pitchWheel(int voice, int value)
 {
     qint32 msg = 0xE0 + voice;
     msg |= (value & 0x7F)<<8; // fine adjustment
     msg |= (value / 128)<<16; // coarse adjustment
-    outSendMsg(msg);
+    sendMsg(msg);
 }
 
-void QMidiOut::outControlChange(int voice, int number, int value)
+void QMidiOut::controlChange(int voice, int number, int value)
 {
     qint32 msg = 0xB0 + voice;
     msg |= (number)<<8;
     msg |= (value)<<16;
-    outSendMsg(msg);
+    sendMsg(msg);
 }
 
-void QMidiOut::outStopAll()
+void QMidiOut::stopAll()
 {
     for(int i = 0;i<16;i++)
-    { outStopAll(i); }
+    { stopAll(i); }
 }
 
-void QMidiOut::outStopAll(int voice)
+void QMidiOut::stopAll(int voice)
 {
-    outSendMsg((0xB0 | voice) | (0x7B<<8));
+    sendMsg((0xB0 | voice) | (0x7B<<8));
 }

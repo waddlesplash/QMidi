@@ -35,24 +35,24 @@ class QMidiOut : public QObject
 {
     Q_OBJECT
 public:
-    static QMap<QString, QString> outDeviceNames();
-    static bool initMidiOut(QString outDeviceId);
-    static void closeMidiOut();
-    static void outSendMsg(qint32 msg);
+    static QMap<QString, QString> devices();
+    static bool connect(QString outDeviceId);
+    static void disconnect();
+    static void sendMsg(qint32 msg);
 
-    static void outSetInstr(int voice, int instr);
-    static void outNoteOn(int note, int voice, int velocity = 64);
-    static void outNoteOff(int note, int voice);
-    static void outPitchWheel(int voice, int value);
-    static void outControlChange(int voice, int number, int value);
-    static void outStopAll();
-    static void outStopAll(int voice);
+    static void setInstr(int voice, int instr);
+    static void noteOn(int note, int voice, int velocity = 64);
+    static void noteOff(int note, int voice);
+    static void pitchWheel(int voice, int value);
+    static void controlChange(int voice, int number, int value);
+    static void stopAll();
+    static void stopAll(int voice);
 
 signals:
     void allNotesStopped(int voice);
 
 private:
-    static QString myOutDeviceId;
+    static QString myDeviceId;
 };
 
 #endif // QMIDIOUT_H

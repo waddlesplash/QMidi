@@ -63,7 +63,7 @@ protected:
             }
         }
 
-        QMidiOut::closeMidiOut();
+        QMidiOut::disconnect();
     }
 private slots:
     void handleEvent()
@@ -74,7 +74,7 @@ private slots:
         else
         {
             qint32 message = midi_file_event->message();
-            QMidiOut::outSendMsg(message);
+            QMidiOut::sendMsg(message);
         }
     }
 };
@@ -83,7 +83,7 @@ static void usage(char *program_name)
 {
     fprintf(stderr, "Usage: %s -p<port> <MidiFile>\n\n", program_name);
     fprintf(stderr, "Ports:\nID	Name\n----------------\n");
-    QMap<QString,QString> vals = QMidiOut::outDeviceNames();
+    QMap<QString,QString> vals = QMidiOut::devices();
     foreach(QString key,vals.keys())
     {
         QString value = vals.value(key);
@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
     }
     midi_file->load(filename);
 
-    QMidiOut::initMidiOut(midiOutName);
+    QMidiOut::connect(midiOutName);
 
     MidiPlayer* p = new MidiPlayer(midi_file);
     QObject::connect(p,SIGNAL(finished()),&a,SLOT(quit()));
