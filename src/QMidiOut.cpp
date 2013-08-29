@@ -52,9 +52,6 @@ struct MidiPtrObjs {
 
 // TODO: error reporting
 
-MidiPtrObjs QMidiOut::myMidiPtrs;
-QString QMidiOut::myDeviceId;
-
 QMap<QString,QString> QMidiOut::devices()
 {
     QMap<QString,QString> ret;
@@ -116,29 +113,36 @@ QMap<QString,QString> QMidiOut::devices()
     return ret;
 }
 
+
+QMidiOut::QMidiOut(QObject *p)
+    : QObject(p)
+{
+    myMidiPtrs = new MidiPtrObjs;
+}
+
 bool QMidiOut::connect(QString outDeviceId)
 {
 #if defined(Q_OS_WIN)
-    midiOutOpen(&myMidiPtrs.midiOutPtr,outDeviceId.toInt(),0,0,CALLBACK_NULL);
+    midiOutOpen(&myMidiPtrs->midiOutPtr,outDeviceId.toInt(),0,0,CALLBACK_NULL);
 #elif defined(Q_OS_LINUX)
-    int err = snd_seq_open(&myMidiPtrs.midiOutPtr, "default", SND_SEQ_OPEN_OUTPUT, 0);
+    int err = snd_seq_open(&myMidiPtrs->midiOutPtr, "default", SND_SEQ_OPEN_OUTPUT, 0);
     if(err < 0) { return false; }
-    snd_seq_set_client_name(myMidiPtrs.midiOutPtr, "QtMidi");
+    snd_seq_set_client_name(myMidiPtrs->midiOutPtr, "QtMidi");
 
-    snd_seq_create_simple_port(myMidiPtrs.midiOutPtr, "Output Port",
+    snd_seq_create_simple_port(myMidiPtrs->midiOutPtr, "Output Port",
                                SND_SEQ_PORT_CAP_READ, SND_SEQ_PORT_TYPE_MIDI_GENERIC);
 
     QStringList l = outDeviceId.split(":");
     int client = l.at(0).toInt();
     int port = l.at(1).toInt();
-    snd_seq_connect_to(myMidiPtrs.midiOutPtr, 0, client, port);
+    snd_seq_connect_to(myMidiPtrs->midiOutPtr, 0, client, port);
 #elif defined(Q_OS_HAIKU)
-    myMidiPtrs.midiOutConsumer = BMidiRoster::FindConsumer(outDeviceId.toInt());
-    if(myMidiPtrs.midiOutConsumer == NULL) { return false; }
-    myMidiPtrs.midiOutLocProd = new BMidiLocalProducer("QtMidi");
-    if(!myMidiPtrs.midiOutLocProd->IsValid()) { midiOutLocProd->Release(); return false; } // some error ??
-    myMidiPtrs.midiOutLocProd->Register();
-    if(myMidiPtrs.midiOutLocProd->Connect(midiOutConsumer) != B_OK) { return false; }
+    myMidiPtrs->midiOutConsumer = BMidiRoster::FindConsumer(outDeviceId.toInt());
+    if(myMidiPtrs->midiOutConsumer == NULL) { return false; }
+    myMidiPtrs->midiOutLocProd = new BMidiLocalProducer("QtMidi");
+    if(!myMidiPtrs->midiOutLocProd->IsValid()) { midiOutLocProd->Release(); return false; } // some error ??
+    myMidiPtrs->midiOutLocProd->Register();
+    if(myMidiPtrs->midiOutLocProd->Connect(midiOutConsumer) != B_OK) { return false; }
 #endif
     myDeviceId = outDeviceId;
     return true;
@@ -147,18 +151,18 @@ bool QMidiOut::connect(QString outDeviceId)
 void QMidiOut::disconnect()
 {
 #if defined(Q_OS_WIN)
-    midiOutClose(myMidiPtrs.midiOutPtr);
+    midiOutClose(myMidiPtrs->midiOutPtr);
 #elif defined(Q_OS_LINUX)
     QStringList l = myOutDeviceId.split(":");
     int client = l.at(0).toInt();
     int port = l.at(1).toInt();
 
-    snd_seq_disconnect_from(myMidiPtrs.midiOutPtr, 0, client,port);
+    snd_seq_disconnect_from(myMidiPtrs->midiOutPtr, 0, client,port);
 #elif defined(Q_OS_HAIKU)
-    myMidiPtrs.midiOutLocProd->Disconnect(midiOutConsumer);
-    myMidiPtrs.midiOutConsumer->Release();
-    myMidiPtrs.midiOutLocProd->Unregister();
-    myMidiPtrs.midiOutLocProd->Release();
+    myMidiPtrs->midiOutLocProd->Disconnect(midiOutConsumer);
+    myMidiPtrs->midiOutConsumer->Release();
+    myMidiPtrs->midiOutLocProd->Unregister();
+    myMidiPtrs->midiOutLocProd->Release();
 #endif
 }
 
@@ -172,7 +176,7 @@ void QMidiOut::sendMsg(qint32 msg)
 #endif
   
 #if defined(Q_OS_WIN)
-    midiOutShortMsg(myMidiPtrs.midiOutPtr,(DWORD)msg);
+    midiOutShortMsg(myMidiPtrs->midiOutPtr,(DWORD)msg);
 #elif defined(Q_OS_LINUX)
     snd_seq_event_t ev;
     snd_midi_event_t* mev;
@@ -186,10 +190,10 @@ void QMidiOut::sendMsg(qint32 msg)
     snd_midi_event_resize_buffer(mev, 3);
     snd_midi_event_encode(mev,(unsigned char*)&buf, 3, &ev);
 
-    snd_seq_event_output(myMidiPtrs.midiOutPtr, &ev);
-    snd_seq_drain_output(myMidiPtrs.midiOutPtr);
+    snd_seq_event_output(myMidiPtrs->midiOutPtr, &ev);
+    snd_seq_drain_output(myMidiPtrs->midiOutPtr);
 #elif defined(Q_OS_HAIKU)
-    myMidiPtrs.midiOutLocProd->SprayData((void*)&buf,3,true);
+    myMidiPtrs->midiOutLocProd->SprayData((void*)&buf,3,true);
 #endif
 }
 

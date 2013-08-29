@@ -36,12 +36,14 @@ class MidiPlayer : public QThread
 {
     Q_OBJECT
 public:
-    MidiPlayer(QMidiFile* file)
-    { midi_file = file; }
+    MidiPlayer(QMidiFile* file, QMidiOut* out)
+    { midi_file = file; midi_out = out; }
 
 private:
     QMidiEvent* midi_file_event;
     QMidiFile* midi_file;
+    QMidiOut* midi_out;
+
 protected:
     void run()
     {
@@ -50,7 +52,7 @@ protected:
         QList<QMidiEvent*>* events = midi_file->events();
         for(int i = 0; i < events->count(); i++)
         {
-            QMidiEvent* midi_file_event = events->at(i);
+            midi_file_event = events->at(i);
             if (midi_file_event->type() != QMidiEvent::Meta)
             {
                 qint64 event_time = midi_file->timeFromTick(midi_file_event->tick()) * 1000;
@@ -63,7 +65,7 @@ protected:
             }
         }
 
-        QMidiOut::disconnect();
+        midi_out->disconnect();
     }
 private slots:
     void handleEvent()
@@ -74,7 +76,7 @@ private slots:
         else
         {
             qint32 message = midi_file_event->message();
-            QMidiOut::sendMsg(message);
+            midi_out->sendMsg(message);
         }
     }
 };
@@ -124,9 +126,10 @@ int main(int argc, char *argv[])
     }
     midi_file->load(filename);
 
-    QMidiOut::connect(midiOutName);
+    QMidiOut* midi_out = new QMidiOut();
+    midi_out->connect(midiOutName);
 
-    MidiPlayer* p = new MidiPlayer(midi_file);
+    MidiPlayer* p = new MidiPlayer(midi_file,midi_out);
     QObject::connect(p,SIGNAL(finished()),&a,SLOT(quit()));
     p->start();
 

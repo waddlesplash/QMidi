@@ -38,24 +38,26 @@ class QMidiOut : public QObject
     Q_OBJECT
 public:
     static QMap<QString, QString> devices();
-    static bool connect(QString outDeviceId);
-    static void disconnect();
-    static void sendMsg(qint32 msg);
 
-    static void setInstr(int voice, int instr);
-    static void noteOn(int note, int voice, int velocity = 64);
-    static void noteOff(int note, int voice);
-    static void pitchWheel(int voice, int value);
-    static void controlChange(int voice, int number, int value);
-    static void stopAll();
-    static void stopAll(int voice);
+    QMidiOut(QObject* p = 0);
+    bool connect(QString outDeviceId);
+    void disconnect();
+    void sendMsg(qint32 msg);
+
+    void setInstr(int voice, int instr);
+    void noteOn(int note, int voice, int velocity = 64);
+    void noteOff(int note, int voice);
+    void pitchWheel(int voice, int value);
+    void controlChange(int voice, int number, int value);
+    void stopAll();
+    void stopAll(int voice);
 
 signals:
     void allNotesStopped(int voice);
 
 private:
-    static QString myDeviceId;
-    static MidiPtrObjs myMidiPtrs;
+    QString myDeviceId;
+    MidiPtrObjs* myMidiPtrs;
 };
 
 #endif // QMIDIOUT_H
