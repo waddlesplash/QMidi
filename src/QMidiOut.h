@@ -31,6 +31,8 @@
 #include <QMap>
 #include <QString>
 
+struct MidiPtrObjs;
+
 class QMidiOut : public QObject
 {
     Q_OBJECT
@@ -53,6 +55,7 @@ signals:
 
 private:
     static QString myDeviceId;
+    static MidiPtrObjs myMidiPtrs;
 };
 
 #endif // QMIDIOUT_H
