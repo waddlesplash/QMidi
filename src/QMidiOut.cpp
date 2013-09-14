@@ -154,7 +154,7 @@ void QMidiOut::disconnect()
 #if defined(Q_OS_WIN)
     midiOutClose(myMidiPtrs->midiOutPtr);
 #elif defined(Q_OS_LINUX)
-    QStringList l = myOutDeviceId.split(":");
+    QStringList l = myDeviceId.split(":");
     int client = l.at(0).toInt();
     int port = l.at(1).toInt();
 
