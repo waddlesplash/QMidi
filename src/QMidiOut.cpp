@@ -25,6 +25,7 @@
 */
 
 #include "QMidiOut.h"
+#include <QStringList>
 
 #if defined(Q_OS_WIN)
 #   include <windows.h> // MmSystem needs DWORD, etc.
