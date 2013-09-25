@@ -1,6 +1,6 @@
 win32 { LIBS += -lwinmm }
-linux-g++ { LIBS += -lasound }
-haiku-g++ { LIBS += -lbe -lmidi -lmidi2 }
+linux* { LIBS += -lasound }
+haiku* { LIBS += -lbe -lmidi -lmidi2 }
 
 INCLUDEPATH += $$PWD
 
