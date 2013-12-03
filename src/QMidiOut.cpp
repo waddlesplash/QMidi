@@ -35,9 +35,9 @@
 #   include <alsa/seq.h>
 #   include <alsa/seq_midi_event.h>
 #elif defined(Q_OS_HAIKU)
-#	include <MidiRoster.h>
-#	include <MidiConsumer.h>
-#	include <MidiProducer.h>
+#   include <MidiRoster.h>
+#   include <MidiConsumer.h>
+#   include <MidiProducer.h>
 #endif
 
 struct MidiPtrObjs {
