@@ -1,3 +1,4 @@
+# QtPlaySMF QMakefile
 
 QT = core
 CONFIG += console
