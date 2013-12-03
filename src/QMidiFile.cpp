@@ -185,7 +185,7 @@ float QMidiEvent::tempo()
     unsigned char* buffer;
     qint32 midi_tempo = 0;
 
-    if (!this->type() == Meta_Tempo) { return -1; }
+    if((myType != Meta) || (myNumber != Tempo)) { return -1; }
 
     buffer = (unsigned char*)myData.constData();
     midi_tempo = (buffer[0] << 16) | (buffer[1] << 8) | buffer[2];
@@ -226,12 +226,11 @@ QMidiFile* QMidiFile::oneTrackPerVoice()
         QMidiEvent* e = new QMidiEvent();
         *e = *(myEvents.at(i)); /* copy data buffer */
         if((e->type() == QMidiEvent::Meta) &&
-                  (e->number() == 0x03)) {
-            /* Track Name events */
+           (e->number() == QMidiEvent::TrackName)) {
             e->setTrack(1);
             ret->addEvent(e->tick(), e);
             continue;
-        } else if(e->type() & QMidiEvent::Meta) {
+        } else if(e->type() == QMidiEvent::Meta) {
             e->setTrack(0);
             ret->addEvent(e->tick(), e);
             continue;
@@ -258,7 +257,7 @@ void QMidiFile::addEvent(qint32 tick, QMidiEvent* e)
 {
     e->setTick(tick);
     myEvents.append(e);
-    if((e->track() == 0) && (e->type() == QMidiEvent::Meta_Tempo)) {
+    if((e->track() == 0) && (e->number()== QMidiEvent::Tempo)) {
         myTempoEvents.append(e);
     }
     sort();
@@ -266,8 +265,9 @@ void QMidiFile::addEvent(qint32 tick, QMidiEvent* e)
 void QMidiFile::removeEvent(QMidiEvent* e)
 {
     myEvents.removeOne(e);
-    if((e->track() == 0) && (e->type() == QMidiEvent::Meta_Tempo))
-    { myTempoEvents.removeOne(e); }
+    if((e->track() == 0) && (e->number() == QMidiEvent::Tempo)) {
+        myTempoEvents.removeOne(e);
+    }
 }
 
 QList<QMidiEvent*> QMidiFile::eventsForTrack(int track)
@@ -393,24 +393,7 @@ QMidiEvent* QMidiFile::createSysexEvent(int track, qint32 tick, QByteArray data)
 QMidiEvent* QMidiFile::createMetaEvent(int track, qint32 tick, int number, QByteArray data)
 {
     QMidiEvent* e = new QMidiEvent();
-    switch(number)
-    {
-    case 0x51:
-        e->setType(QMidiEvent::Meta_Tempo);
-        break;
-    case 0x58:
-        e->setType(QMidiEvent::Meta_TimeSignature);
-        break;
-    case 0x5:
-        e->setType(QMidiEvent::Meta_Lyric);
-        break;
-    case 0x6:
-        e->setType(QMidiEvent::Meta_Marker);
-        break;
-    default:
-        e->setType(QMidiEvent::Meta);
-        break;
-    }
+    e->setType(QMidiEvent::Meta);
     e->setTrack(track);
     e->setNumber(number);
     e->setData(data);
@@ -424,12 +407,13 @@ QMidiEvent* QMidiFile::createTempoEvent(int track, qint32 tick, float tempo)
     buffer[0] = (midi_tempo >> 16) & 0xFF;
     buffer[1] = (midi_tempo >> 8) & 0xFF;
     buffer[2] = midi_tempo & 0xFF;
-    return createMetaEvent(track, tick, 0x51, buffer);
+    return createMetaEvent(track, tick, QMidiEvent::Tempo, buffer);
 }
 QMidiEvent* QMidiFile::createTimeSignatureEvent(int track, qint32 tick, int numerator, int denominator)
 {
     QMidiEvent* e = new QMidiEvent();
-    e->setType(QMidiEvent::Meta_TimeSignature);
+    e->setType(QMidiEvent::Meta);
+    e->setNumber(QMidiEvent::TimeSignature);
     e->setTrack(track);
     e->setNumerator(numerator);
     e->setDenominator(denominator);
@@ -439,7 +423,8 @@ QMidiEvent* QMidiFile::createTimeSignatureEvent(int track, qint32 tick, int nume
 QMidiEvent* QMidiFile::createLyricEvent(int track, qint32 tick, QByteArray text)
 {
     QMidiEvent* e = new QMidiEvent();
-    e->setType(QMidiEvent::Meta_Lyric);
+    e->setType(QMidiEvent::Meta);
+    e->setNumber(QMidiEvent::Lyric);
     e->setTrack(track);
     e->setData(text);
     addEvent(tick,e);
@@ -448,7 +433,8 @@ QMidiEvent* QMidiFile::createLyricEvent(int track, qint32 tick, QByteArray text)
 QMidiEvent* QMidiFile::createMarkerEvent(int track, qint32 tick, QByteArray text)
 {
     QMidiEvent* e = new QMidiEvent();
-    e->setType(QMidiEvent::Meta_Marker);
+    e->setType(QMidiEvent::Meta);
+    e->setNumber(QMidiEvent::Marker);
     e->setTrack(track);
     e->setData(text);
     addEvent(tick,e);
@@ -1031,10 +1017,6 @@ bool QMidiFile::save(QString filename)
                 break;
             }
             case QMidiEvent::Meta:
-            case QMidiEvent::Meta_Lyric:
-            case QMidiEvent::Meta_Tempo:
-            case QMidiEvent::Meta_Marker:
-            case QMidiEvent::Meta_TimeSignature:
             {
                 int data_length = e->data().size();
                 unsigned char *data = (unsigned char*)e->data().constData();

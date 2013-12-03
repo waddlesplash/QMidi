@@ -44,14 +44,19 @@ public:
         ControlChange,
         ProgramChange,
         PitchWheel,
-        Meta = 256, // so we can do Meta | Meta_Tempo...
-        Meta_Tempo = 256+1,
-        Meta_TimeSignature = 256+2,
-        Meta_Lyric = 256+3,
-        Meta_Marker = 256+4,
+        Meta,
         SysEx
     };
-    
+    enum MetaNumbers {
+        /* These types match the MIDI values for them.
+         * DON'T CHANGE OR YOU WON'T BE ABLE TO READ/WRITE FILES! */
+        TrackName = 0x03,
+        Tempo = 0x51,
+        TimeSignature = 0x58,
+        Lyric = 0x5,
+        Marker = 0x6
+    };
+
     QMidiEvent();
     inline ~QMidiEvent() {}
     
@@ -105,7 +110,7 @@ private:
     int myNote;
     int myVelocity;
     int myAmount; // KeyPressure, ChannelPressure
-    int myNumber; // ControlChange, ProgramChange
+    int myNumber; // ControlChange, ProgramChange, Meta
     int myValue; // PitchWheel, ControlChange
     int myNumerator; // TimeSignature
     int myDenominator; // TimeSignature
