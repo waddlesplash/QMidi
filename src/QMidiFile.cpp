@@ -197,8 +197,9 @@ float QMidiEvent::tempo()
 QMidiFile::QMidiFile()
 {
     myDivType = PPQ;
-    myFileFormat = 0;
+    myFileFormat = 1;
     myResolution = 0;
+    disableSort = false;
 }
 
 bool isGreaterThan(QMidiEvent* e1,QMidiEvent* e2)
@@ -209,8 +210,46 @@ bool isGreaterThan(QMidiEvent* e1,QMidiEvent* e2)
     else { return false; }
 }
 
+QMidiFile* QMidiFile::oneTrackPerVoice()
+{
+    if(myFileFormat != 0) { return 0; }
+    QMidiFile* ret = new QMidiFile();
+
+    ret->setDivisionType(myDivType);
+    ret->setResolution(myResolution);
+    ret->setFileFormat(1);
+
+    QMap<int/*voice*/,int/*track*/> tracks;
+    ret->createTrack(); /* Track 0 */
+    ret->setSortDisabled(true);
+    for(int i = 0; i < myEvents.size(); i++) {
+        QMidiEvent* e = new QMidiEvent();
+        *e = *(myEvents.at(i)); /* copy data buffer */
+        if((e->type() == QMidiEvent::Meta) &&
+                  (e->number() == 0x03)) {
+            /* Track Name events */
+            e->setTrack(1);
+            ret->addEvent(e->tick(), e);
+            continue;
+        } else if(e->type() & QMidiEvent::Meta) {
+            e->setTrack(0);
+            ret->addEvent(e->tick(), e);
+            continue;
+        }
+        if(!tracks.contains(e->voice())) {
+            tracks.insert(e->voice(),ret->createTrack());
+        }
+        e->setTrack(tracks.value(e->voice()));
+        ret->addEvent(e->tick(), e);
+    }
+    ret->setSortDisabled(false);
+    ret->sort();
+    return ret;
+}
+
 void QMidiFile::sort()
 {
+    if(disableSort) { return; }
     qStableSort(myEvents.begin(),myEvents.end(),isGreaterThan);
     qStableSort(myTempoEvents.begin(),myTempoEvents.end(),isGreaterThan);
 }
@@ -219,11 +258,10 @@ void QMidiFile::addEvent(qint32 tick, QMidiEvent* e)
 {
     e->setTick(tick);
     myEvents.append(e);
-    if(!disableSort) { sort(); }
-    if((e->track() == 0) && (e->type() == QMidiEvent::Meta_Tempo))
-    {
+    if((e->track() == 0) && (e->type() == QMidiEvent::Meta_Tempo)) {
         myTempoEvents.append(e);
     }
+    sort();
 }
 void QMidiFile::removeEvent(QMidiEvent* e)
 {
@@ -872,7 +910,6 @@ bool QMidiFile::load(QString filename)
                         QByteArray data = in.read(data_length);
 
                         if (number == 0x2F) {
-                            setTrackEndTick(track, tick);
                             at_end_of_track = 1;
                         } else {
                             createMetaEvent(track, tick, number, data);

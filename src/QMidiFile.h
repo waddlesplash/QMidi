@@ -131,15 +131,19 @@ public:
     };
 
     QMidiFile();
-    inline ~QMidiFile() {}
 
     bool load(QString filename);
     bool save(QString filename);
+
+    QMidiFile* oneTrackPerVoice();
 
     void sort();
 
     inline void setFileFormat(int fileFormat) { myFileFormat = fileFormat; }
     inline int fileFormat() { return myFileFormat; }
+
+    inline bool sortDisabled() { return disableSort; }
+    inline void setSortDisabled(bool disabled) { disableSort = disabled; }
 
     inline void setResolution(int resolution) { myResolution = resolution; }
     inline int resolution() { return myResolution; }
@@ -152,8 +156,7 @@ public:
 
     int createTrack();
     void removeTrack(int track);
-    inline void setTrackEndTick(int track, qint32 tick) { myTrackEndTicks.insert(track,tick); }
-    inline qint32 trackEndTick(int track) { return myTrackEndTicks.value(track); }
+    inline qint32 trackEndTick(int track) { return eventsForTrack(track).last()->tick(); }
     inline QList<int> tracks() { return myTracks; }
 
     QMidiEvent* createNoteOffEvent(int track, qint32 tick, int voice, int note, int velocity = 64);
@@ -190,7 +193,6 @@ private:
     QList<QMidiEvent*> myEvents;
     QList<QMidiEvent*> myTempoEvents;
     QList<int> myTracks;
-    QMap<qint16,qint32> myTrackEndTicks;
     DivisionType myDivType;
     qint16 myResolution;
     qint16 myFileFormat;
