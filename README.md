@@ -1,4 +1,4 @@
-# QMidi
+# QMidi [![Build Status](https://travis-ci.org/waddlesplash/qtmidi.png)](https://travis-ci.org/waddlesplash/qtmidi)
 A simple, cross-platform way to support MIDI. Classes for MIDI Output and MIDI File I/O are supported.
 MIDI output is supported on Windows (via `mmsystem`), Linux (via `ALSA`), and Haiku (via `libmidi2` - EXPERIMENTAL).
 
