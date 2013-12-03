@@ -31,6 +31,7 @@
 #include <QMap>
 #include <QString>
 
+class QMidiEvent;
 struct MidiPtrObjs;
 
 class QMidiOut : public QObject
@@ -39,9 +40,10 @@ class QMidiOut : public QObject
 public:
     static QMap<QString, QString> devices();
 
-    QMidiOut(QObject* p = 0);
+    QMidiOut(QObject* parent = 0);
     bool connect(QString outDeviceId);
     void disconnect();
+    void sendEvent(QMidiEvent* e);
     void sendMsg(qint32 msg);
 
     void setInstr(int voice, int instr);

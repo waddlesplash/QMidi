@@ -25,7 +25,9 @@
 */
 
 #include "QMidiOut.h"
+
 #include <QStringList>
+#include "QMidiFile.h"
 
 #if defined(Q_OS_WIN)
 #   include <windows.h> // MmSystem needs DWORD, etc.
@@ -115,8 +117,8 @@ QMap<QString,QString> QMidiOut::devices()
 }
 
 
-QMidiOut::QMidiOut(QObject *p)
-    : QObject(p)
+QMidiOut::QMidiOut(QObject *parent)
+    : QObject(parent)
 {
     myMidiPtrs = new MidiPtrObjs;
 }
@@ -165,6 +167,11 @@ void QMidiOut::disconnect()
     myMidiPtrs->midiOutLocProd->Unregister();
     myMidiPtrs->midiOutLocProd->Release();
 #endif
+}
+
+void QMidiOut::sendEvent(QMidiEvent* e)
+{
+    sendMsg(e->message());
 }
 
 void QMidiOut::sendMsg(qint32 msg)
