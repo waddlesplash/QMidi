@@ -315,6 +315,23 @@ void QMidiFile::removeTrack(int track)
     { myTracks.removeOne(track); }
 }
 
+qint32 QMidiFile::trackEndTick(int track)
+{
+    for(int i = myEvents.size(); i >= 0; i--) {
+        QMidiEvent* e = myEvents.at(i);
+        if(e->track() == track) {
+            return e->tick();
+        }
+    }
+    return 0;
+}
+
+QMidiEvent* QMidiFile::createNote(int track, qint32 start_tick, qint32 end_tick, int voice, int note, int start_velocity, int end_velocity)
+{
+    createNoteOffEvent(track,end_tick,voice,note,end_velocity);
+    return createNoteOnEvent(track,start_tick,voice,note,start_velocity);
+}
+
 QMidiEvent* QMidiFile::createNoteOffEvent(int track, qint32 tick, int voice, int note, int velocity)
 {
     QMidiEvent* e = new QMidiEvent();

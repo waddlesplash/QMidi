@@ -161,15 +161,14 @@ public:
 
     int createTrack();
     void removeTrack(int track);
-    inline qint32 trackEndTick(int track) { return eventsForTrack(track).last()->tick(); }
+    qint32 trackEndTick(int track);
     inline QList<int> tracks() { return myTracks; }
 
-    QMidiEvent* createNoteOffEvent(int track, qint32 tick, int voice, int note, int velocity = 64);
-    /* velocity here is how fast to stop the note (127=fastest) */
     QMidiEvent* createNoteOnEvent(int track, qint32 tick, int voice, int note, int velocity);
+    QMidiEvent* createNoteOffEvent(int track, qint32 tick, int voice, int note, int velocity = 64);
+    /* velocity on NoteOff events is how fast to stop the note (127=fastest) */
 
-    inline QMidiEvent* createNote(int track, qint32 start_tick, qint32 end_tick, int voice, int note, int start_velocity, int end_velocity)
-    { createNoteOffEvent(track,end_tick,voice,note,end_velocity); return createNoteOnEvent(track,start_tick,voice,note,start_velocity); }
+    QMidiEvent* createNote(int track, qint32 start_tick, qint32 end_tick, int voice, int note, int start_velocity, int end_velocity);
     /* returns the start event */
 
     QMidiEvent* createKeyPressureEvent(int track, qint32 tick, int voice, int note, int amount);
