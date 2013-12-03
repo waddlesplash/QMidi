@@ -58,7 +58,6 @@ public:
     };
 
     QMidiEvent();
-    inline ~QMidiEvent() {}
     
     inline EventType type() { return myType; }
     inline void setType(EventType newType) { myType = newType; }
@@ -136,6 +135,7 @@ public:
     };
 
     QMidiFile();
+    ~QMidiFile();
 
     bool load(QString filename);
     bool save(QString filename);
@@ -199,8 +199,8 @@ private:
     QList<QMidiEvent*> myTempoEvents;
     QList<int> myTracks;
     DivisionType myDivType;
-    qint16 myResolution;
-    qint16 myFileFormat;
+    int myResolution;
+    int myFileFormat;
     bool disableSort;
 };
 

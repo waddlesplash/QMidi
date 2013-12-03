@@ -202,6 +202,14 @@ QMidiFile::QMidiFile()
     disableSort = false;
 }
 
+QMidiFile::~QMidiFile()
+{
+    for(int i = 0; i < myEvents.size(); i++) {
+        QMidiEvent* e = myEvents.at(i);
+        delete e;
+    }
+}
+
 bool isGreaterThan(QMidiEvent* e1,QMidiEvent* e2)
 {
     qint32 e1t = e1->tick();
