@@ -1,6 +1,5 @@
 
-QT += core
-QT -= gui
+QT = core
 CONFIG += console
 TEMPLATE = app
 TARGET = qtplaysmf
