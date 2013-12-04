@@ -141,11 +141,19 @@ bool QMidiOut::connect(QString outDeviceId)
     snd_seq_connect_to(myMidiPtrs->midiOutPtr, 0, client, port);
 #elif defined(Q_OS_HAIKU)
     myMidiPtrs->midiOutConsumer = BMidiRoster::FindConsumer(outDeviceId.toInt());
-    if(myMidiPtrs->midiOutConsumer == NULL) { return false; }
+    if(myMidiPtrs->midiOutConsumer == NULL) {
+        return false;
+    }
     myMidiPtrs->midiOutLocProd = new BMidiLocalProducer("QtMidi");
-    if(!myMidiPtrs->midiOutLocProd->IsValid()) { midiOutLocProd->Release(); return false; } // some error ??
+    if(!myMidiPtrs->midiOutLocProd->IsValid()) {
+        myMidiPtrs->midiOutLocProd->Release();
+        /* something failed */
+        return false;
+    }
     myMidiPtrs->midiOutLocProd->Register();
-    if(myMidiPtrs->midiOutLocProd->Connect(midiOutConsumer) != B_OK) { return false; }
+    if(myMidiPtrs->midiOutLocProd->Connect(myMidiPtrs->midiOutConsumer) != B_OK) {
+        return false;
+    }
 #endif
     myDeviceId = outDeviceId;
     return true;
@@ -162,7 +170,7 @@ void QMidiOut::disconnect()
 
     snd_seq_disconnect_from(myMidiPtrs->midiOutPtr, 0, client,port);
 #elif defined(Q_OS_HAIKU)
-    myMidiPtrs->midiOutLocProd->Disconnect(midiOutConsumer);
+    myMidiPtrs->midiOutLocProd->Disconnect(myMidiPtrs->midiOutConsumer);
     myMidiPtrs->midiOutConsumer->Release();
     myMidiPtrs->midiOutLocProd->Unregister();
     myMidiPtrs->midiOutLocProd->Release();
