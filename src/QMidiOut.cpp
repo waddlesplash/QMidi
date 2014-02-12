@@ -30,43 +30,44 @@
 #include "QMidiFile.h"
 
 #if defined(Q_OS_WIN)
-#   include <windows.h> // MmSystem needs DWORD, etc.
-#   include <mmsystem.h>
+    #include <windows.h>
+    #include <mmsystem.h>
+    struct MidiPtrObjs {
+        HMIDIOUT midiOutPtr;
+    };
 #elif defined(Q_OS_LINUX)
-#   include <alsa/asoundlib.h>
-#   include <alsa/seq.h>
-#   include <alsa/seq_midi_event.h>
+    #include <alsa/asoundlib.h>
+    #include <alsa/seq.h>
+    #include <alsa/seq_midi_event.h>
+    struct MidiPtrObjs {
+        snd_seq_t *midiOutPtr;
+    };
 #elif defined(Q_OS_HAIKU)
-#   include <MidiRoster.h>
-#   include <MidiConsumer.h>
-#   include <MidiProducer.h>
+    #include <MidiRoster.h>
+    #include <MidiConsumer.h>
+    #include <MidiProducer.h>
+    struct MidiPtrObjs {
+        BMidiConsumer* midiOutConsumer;
+        BMidiLocalProducer* midiOutLocProd;
+    };
 #endif
-
-struct MidiPtrObjs {
-#if defined(Q_OS_WIN)
-    HMIDIOUT midiOutPtr;
-#elif defined(Q_OS_LINUX)
-    snd_seq_t *midiOutPtr;
-#elif defined(Q_OS_HAIKU)
-    BMidiConsumer* midiOutConsumer;
-    BMidiLocalProducer* midiOutLocProd;
-#endif
-};
 
 // TODO: error reporting
 
-QMap<QString,QString> QMidiOut::devices()
+QMap<QString, QString> QMidiOut::devices()
 {
-    QMap<QString,QString> ret;
+    QMap<QString, QString> ret;
 
 #if defined(Q_OS_WIN)
     int numDevs = midiOutGetNumDevs();
-    if(numDevs == 0) { return ret; }
+    if(numDevs == 0) {
+        return ret;
+    }
 
-    for(int i = 0;i<numDevs;i++) {
+    for(int i = 0; i < numDevs; i++) {
         MIDIOUTCAPS* devCaps = new MIDIOUTCAPS;
-        midiOutGetDevCaps(i,devCaps,sizeof(*devCaps));
-        ret.insert(QString::number(i),QString::fromWCharArray(devCaps->szPname));
+        midiOutGetDevCaps(i, devCaps, sizeof(*devCaps));
+        ret.insert(QString::number(i), QString::fromWCharArray(devCaps->szPname));
         delete devCaps;
     }
 #elif defined(Q_OS_LINUX)
@@ -77,8 +78,10 @@ QMap<QString,QString> QMidiOut::devices()
     snd_seq_t *handle;
 
     err = snd_seq_open(&handle, "hw", SND_SEQ_OPEN_DUPLEX, 0);
-    if(err < 0)
-    { /* Could not open sequencer!! use  snd_strerror(errno)  to get error. */ return ret; }
+    if(err < 0) {
+        /* Use snd_strerror(errno) to get the error here. */
+        return ret;
+    }
 
     snd_seq_client_info_alloca(&cinfo);
     snd_seq_client_info_set_client(cinfo, -1);
@@ -95,7 +98,7 @@ QMap<QString,QString> QMidiOut::devices()
                 QString port = QString::number(snd_seq_port_info_get_client(pinfo));
                 port += ":" + QString::number(snd_seq_port_info_get_port(pinfo));
                 QString name = snd_seq_client_info_get_name(cinfo);
-                ret.insert(port,name);
+                ret.insert(port, name);
             }
         }
     }
@@ -105,7 +108,7 @@ QMap<QString,QString> QMidiOut::devices()
     while(OK) {
         BMidiConsumer* c = BMidiRoster::NextConsumer(&id);
         if(c != NULL) {
-            ret.insert(QString::number(id),QString::fromUtf8(c->Name()));
+            ret.insert(QString::number(id), QString::fromUtf8(c->Name()));
             c->Release();
         } else {
             OK = false;
@@ -129,10 +132,12 @@ bool QMidiOut::connect(QString outDeviceId)
     disconnect();
 
 #if defined(Q_OS_WIN)
-    midiOutOpen(&myMidiPtrs->midiOutPtr,outDeviceId.toInt(),0,0,CALLBACK_NULL);
+    midiOutOpen(&myMidiPtrs->midiOutPtr, outDeviceId.toInt(), 0, 0, CALLBACK_NULL);
 #elif defined(Q_OS_LINUX)
     int err = snd_seq_open(&myMidiPtrs->midiOutPtr, "default", SND_SEQ_OPEN_OUTPUT, 0);
-    if(err < 0) { return false; }
+    if(err < 0) {
+        return false;
+    }
     snd_seq_set_client_name(myMidiPtrs->midiOutPtr, "QtMidi");
 
     snd_seq_create_simple_port(myMidiPtrs->midiOutPtr, "Output Port",
@@ -147,10 +152,9 @@ bool QMidiOut::connect(QString outDeviceId)
     if(myMidiPtrs->midiOutConsumer == NULL) {
         return false;
     }
-    myMidiPtrs->midiOutLocProd = new BMidiLocalProducer("QtMidi");
+    myMidiPtrs->midiOutLocProd = new BMidiLocalProducer("QMidi");
     if(!myMidiPtrs->midiOutLocProd->IsValid()) {
         myMidiPtrs->midiOutLocProd->Release();
-        /* something failed */
         return false;
     }
     myMidiPtrs->midiOutLocProd->Register();
@@ -185,11 +189,6 @@ void QMidiOut::disconnect()
     myConnected = false;
 }
 
-void QMidiOut::sendEvent(QMidiEvent* e)
-{
-    sendMsg(e->message());
-}
-
 void QMidiOut::sendMsg(qint32 msg)
 {
     if(!myConnected) { return; }
@@ -202,7 +201,7 @@ void QMidiOut::sendMsg(qint32 msg)
 #endif
   
 #if defined(Q_OS_WIN)
-    midiOutShortMsg(myMidiPtrs->midiOutPtr,(DWORD)msg);
+    midiOutShortMsg(myMidiPtrs->midiOutPtr, (DWORD)msg);
 #elif defined(Q_OS_LINUX)
     snd_seq_event_t ev;
     snd_midi_event_t* mev;
@@ -219,8 +218,13 @@ void QMidiOut::sendMsg(qint32 msg)
     snd_seq_event_output(myMidiPtrs->midiOutPtr, &ev);
     snd_seq_drain_output(myMidiPtrs->midiOutPtr);
 #elif defined(Q_OS_HAIKU)
-    myMidiPtrs->midiOutLocProd->SprayData((void*)&buf,3,true);
+    myMidiPtrs->midiOutLocProd->SprayData((void*)&buf, 3, true);
 #endif
+}
+
+void QMidiOut::sendEvent(QMidiEvent* e)
+{
+    sendMsg(e->message());
 }
 
 void QMidiOut::setInstr(int voice, int instr)
@@ -248,7 +252,7 @@ void QMidiOut::noteOff(int note, int voice)
 void QMidiOut::pitchWheel(int voice, int value)
 {
     qint32 msg = 0xE0 + voice;
-    msg |= (value & 0x7F)<<8; // fine adjustment
+    msg |= (value & 0x7F)<<8; // fine adjustment (ignored by many synths)
     msg |= (value / 128)<<16; // coarse adjustment
     sendMsg(msg);
 }
@@ -263,8 +267,9 @@ void QMidiOut::controlChange(int voice, int number, int value)
 
 void QMidiOut::stopAll()
 {
-    for(int i = 0;i<16;i++)
-    { stopAll(i); }
+    for(int i = 0; i < 16; i++) {
+        stopAll(i);
+    }
 }
 
 void QMidiOut::stopAll(int voice)
