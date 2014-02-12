@@ -121,10 +121,13 @@ QMidiOut::QMidiOut(QObject *parent)
     : QObject(parent)
 {
     myMidiPtrs = new MidiPtrObjs;
+    myConnected = false;
 }
 
 bool QMidiOut::connect(QString outDeviceId)
 {
+    disconnect();
+
 #if defined(Q_OS_WIN)
     midiOutOpen(&myMidiPtrs->midiOutPtr,outDeviceId.toInt(),0,0,CALLBACK_NULL);
 #elif defined(Q_OS_LINUX)
@@ -156,11 +159,14 @@ bool QMidiOut::connect(QString outDeviceId)
     }
 #endif
     myDeviceId = outDeviceId;
+    myConnected = true;
     return true;
 }
 
 void QMidiOut::disconnect()
 {
+    if(!myConnected) { return; }
+
 #if defined(Q_OS_WIN)
     midiOutClose(myMidiPtrs->midiOutPtr);
 #elif defined(Q_OS_LINUX)
@@ -175,6 +181,8 @@ void QMidiOut::disconnect()
     myMidiPtrs->midiOutLocProd->Unregister();
     myMidiPtrs->midiOutLocProd->Release();
 #endif
+
+    myConnected = false;
 }
 
 void QMidiOut::sendEvent(QMidiEvent* e)
@@ -184,6 +192,8 @@ void QMidiOut::sendEvent(QMidiEvent* e)
 
 void QMidiOut::sendMsg(qint32 msg)
 {
+    if(!myConnected) { return; }
+
 #if !defined(Q_OS_WIN)
     char buf[3];
     buf[0] = msg & 0xFF;

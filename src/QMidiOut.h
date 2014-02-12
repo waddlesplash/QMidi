@@ -60,6 +60,7 @@ signals:
 private:
     QString myDeviceId;
     MidiPtrObjs* myMidiPtrs;
+    bool myConnected;
 };
 
 #endif // QMIDIOUT_H
