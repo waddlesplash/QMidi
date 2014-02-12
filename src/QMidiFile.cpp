@@ -1,9 +1,9 @@
 /*
- * qmidi (QMidiFile.cpp)
+ * QMidiFile (QMidiFile.cpp)
  *  Part of QMidi (http://github.com/waddlesplash/qtmidi).
  *
  * Copyright (c) 2003-2012 by David G. Slomin
- * Copyright (c) 2012-2013 WaddleSplash
+ * Copyright (c) 2012-2014 WaddleSplash
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
@@ -192,7 +192,7 @@ float QMidiEvent::tempo()
     return (float)(60000000.0 / midi_tempo);
 }
 
-/* End of QtMidiEvent functions, on to QtMidiFile */
+/* End of QMidiEvent functions, on to QMidiFile */
 
 QMidiFile::QMidiFile()
 {
