@@ -317,7 +317,7 @@ void QMidiFile::removeTrack(int track)
 
 qint32 QMidiFile::trackEndTick(int track)
 {
-    for(int i = myEvents.size(); i >= 0; i--) {
+    for(int i = myEvents.size()-1; i >= 0; i--) {
         QMidiEvent* e = myEvents.at(i);
         if(e->track() == track) {
             return e->tick();
