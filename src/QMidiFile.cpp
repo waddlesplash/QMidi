@@ -543,13 +543,13 @@ float QMidiFile::beatFromTick(qint32 tick)
     case PPQ:
         return (float)(tick) / myResolution;
     case SMPTE24:
-        return -1.0; /* TODO */
+        return (float)(tick) / 24.0;
     case SMPTE25:
-        return -1.0; /* TODO */
+        return (float)(tick) / 25.0;
     case SMPTE30DROP:
-        return -1.0; /* TODO */
+        return (float)(tick) / 29.97;
     case SMPTE30:
-        return -1.0; /* TODO */
+        return (float)(tick) / 30.0;
     default:
         return -1.0;
     }
@@ -561,13 +561,13 @@ qint32 QMidiFile::tickFromBeat(float beat)
     case PPQ:
         return (qint32)(beat * myResolution);
     case SMPTE24:
-        return -1; /* TODO */
+        return (qint32)(beat * 24.0);
     case SMPTE25:
-        return -1; /* TODO */
+        return (qint32)(beat * 25.0);
     case SMPTE30DROP:
-        return -1; /* TODO */
+        return (qint32)(beat * 29.97);
     case SMPTE30:
-        return -1; /* TODO */
+        return (qint32)(beat * 30);
     default:
         return -1;
     }
