@@ -9,4 +9,3 @@ SOURCES += $$PWD/QMidiOut.cpp \
 
 HEADERS += $$PWD/QMidiOut.h \
 	$$PWD/QMidiFile.h
-
