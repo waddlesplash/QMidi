@@ -173,8 +173,7 @@ QMidiFile::QMidiFile()
 
 QMidiFile::~QMidiFile()
 {
-	for (int i = 0; i < fEvents.size(); i++) {
-		QMidiEvent* e = fEvents.at(i);
+	for (QMidiEvent* e : fEvents) {
 		delete e;
 	}
 }
@@ -200,9 +199,9 @@ QMidiFile* QMidiFile::oneTrackPerVoice()
 	QMap<int /*voice*/, int /*track*/> tracks;
 	ret->createTrack(); /* Track 0 */
 	ret->setSortDisabled(true);
-	for (int i = 0; i < fEvents.size(); i++) {
+	for (QMidiEvent* event : fEvents) {
 		QMidiEvent* e = new QMidiEvent();
-		*e = *(fEvents.at(i)); /* copy data buffer */
+		*e = *event; /* copy data buffer */
 		if ((e->type() == QMidiEvent::Meta) && (e->number() == QMidiEvent::TrackName)) {
 			e->setTrack(1);
 			ret->addEvent(e->tick(), e);

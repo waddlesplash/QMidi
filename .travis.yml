@@ -1,6 +1,6 @@
 sudo: false
 language: cpp
-compiler: gcc
+compiler: clang
 addons:
   apt:
     packages:
@@ -9,5 +9,5 @@ addons:
 install:
  - cd examples/qtplaysmf/
 script:
- - qmake -spec linux-g++ .
+ - qmake -spec unsupported/linux-clang .
  - make
