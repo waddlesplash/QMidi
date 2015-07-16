@@ -22,7 +22,6 @@ public:
 	}
 
 private:
-	QMidiEvent* midi_file_event;
 	QMidiFile* midi_file;
 	QMidiOut* midi_out;
 
@@ -31,30 +30,25 @@ protected:
 	{
 		QElapsedTimer t;
 		t.start();
-		QList<QMidiEvent*>* events = midi_file->events();
-		for (int i = 0; i < events->count(); i++) {
-			midi_file_event = events->at(i);
-			if (midi_file_event->type() != QMidiEvent::Meta) {
-				qint64 event_time = midi_file->timeFromTick(midi_file_event->tick()) * 1000;
+		QList<QMidiEvent*> events = midi_file->events();
+		for (QMidiEvent* e : events) {
+			if (e->type() != QMidiEvent::Meta) {
+				qint64 event_time = midi_file->timeFromTick(e->tick()) * 1000;
 
 				qint32 waitTime = event_time - t.elapsed();
 				if (waitTime > 0) {
 					msleep(waitTime);
 				}
-				handleEvent();
+				if (e->type() == QMidiEvent::SysEx) {
+					// TODO: sysex
+				} else {
+					qint32 message = e->message();
+					midi_out->sendMsg(message);
+				}
 			}
 		}
 
 		midi_out->disconnect();
-	}
-private slots:
-	void handleEvent()
-	{
-		if (midi_file_event->type() == QMidiEvent::SysEx) { // TODO: sysex
-		} else {
-			qint32 message = midi_file_event->message();
-			midi_out->sendMsg(message);
-		}
 	}
 };
 
@@ -63,7 +57,7 @@ static void usage(char* program_name)
 	fprintf(stderr, "Usage: %s -p<port> <MidiFile>\n\n", program_name);
 	fputs("Ports:\nID\tName\n----------------\n", stderr);
 	QMap<QString, QString> vals = QMidiOut::devices();
-	foreach (QString key, vals.keys()) {
+	for (QString key : vals.keys()) {
 		QString value = vals.value(key);
 		fputs(key.toUtf8().constData(), stderr);
 		fputs("\t", stderr);

@@ -162,7 +162,7 @@ public:
 	QMidiEvent* createMarkerEvent(int track, qint32 tick, QByteArray text);
 	QMidiEvent* createVoiceEvent(int track, qint32 tick, quint32 data);
 
-	inline QList<QMidiEvent*>* events() { return &fEvents; }
+	inline QList<QMidiEvent*> events() { return QList<QMidiEvent*>(fEvents); }
 	QList<QMidiEvent*> events(int voice);
 	QList<QMidiEvent*> eventsForTrack(int track);
 
