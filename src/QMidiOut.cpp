@@ -19,7 +19,7 @@ void QMidiOut::sendEvent(QMidiEvent* e)
 	sendMsg(e->message());
 }
 
-void QMidiOut::setInstr(int voice, int instr)
+void QMidiOut::setInstrument(int voice, int instr)
 {
 	qint32 msg = 0x0000C0 + voice;
 	msg |= instr << 8;

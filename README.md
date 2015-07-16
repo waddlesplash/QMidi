@@ -13,7 +13,7 @@ midi.connect("key goes here");
 ```
 ...and then send messages:
 ```cpp
-midi.setInstr(0, 0);
+midi.setInstrument(0, 0);
 /* Voice (0-15), Instrument (0-127) */
 midi.noteOn(60,0);
 /* Note (0-127), Voice (0-15) [, Velocity (0-127)] */
