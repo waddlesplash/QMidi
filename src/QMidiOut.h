@@ -22,7 +22,7 @@ public:
 	void disconnect();
 	void sendMsg(qint32 msg);
 
-	void sendEvent(QMidiEvent* e);
+	void sendEvent(QMidiEvent& e);
 	void setInstrument(int voice, int instr);
 	void noteOn(int note, int voice, int velocity = 64);
 	void noteOff(int note, int voice);

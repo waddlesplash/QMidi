@@ -25,11 +25,11 @@ midi.sendMsg(0x90 + 0 | 60 << 8 | 64 << 16);
 ```
 Or you could construct a QMidiEvent (from `QMidiFile.h`) and send it:
 ```cpp
-QMidiEvent* e = new QMidiEvent();
-e->setType(QMidiEvent::NoteOn);
-e->setVoice(0);
-e->setNote(60);
-e->setVelocity(64);
+QMidiEvent e;
+e.setType(QMidiEvent::NoteOn);
+e.setVoice(0);
+e.setNote(60);
+e.setVelocity(64);
 midi.sendEvent(e);
 ```
 Once you're done:

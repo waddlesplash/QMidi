@@ -14,9 +14,9 @@ QMidiOut::QMidiOut(QObject* parent)
 	fConnected = false;
 }
 
-void QMidiOut::sendEvent(QMidiEvent* e)
+void QMidiOut::sendEvent(QMidiEvent& e)
 {
-	sendMsg(e->message());
+	sendMsg(e.message());
 }
 
 void QMidiOut::setInstrument(int voice, int instr)
