@@ -35,7 +35,7 @@ signals:
 	void allNotesStopped(int voice);
 
 private:
-	QString myDeviceId;
-	MidiPtrObjs* myMidiPtrs;
-	bool myConnected;
+	QString fDeviceId;
+	MidiPtrObjs* fMidiPtrs;
+	bool fConnected;
 };

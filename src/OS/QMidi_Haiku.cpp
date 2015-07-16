@@ -35,48 +35,48 @@ QMap<QString, QString> QMidiOut::devices()
 
 bool QMidiOut::connect(QString outDeviceId)
 {
-	if (myConnected)
+	if (fConnected)
 		disconnect();
-	myMidiPtrs = new MidiPtrObjs;
+	fMidiPtrs = new MidiPtrObjs;
 
-	myMidiPtrs->midiOutConsumer = BMidiRoster::FindConsumer(outDeviceId.toInt());
-	if (myMidiPtrs->midiOutConsumer == NULL) {
+	fMidiPtrs->midiOutConsumer = BMidiRoster::FindConsumer(outDeviceId.toInt());
+	if (fMidiPtrs->midiOutConsumer == NULL) {
 		return false;
 	}
-	myMidiPtrs->midiOutLocProd = new BMidiLocalProducer("QMidi");
-	if (!myMidiPtrs->midiOutLocProd->IsValid()) {
-		myMidiPtrs->midiOutLocProd->Release();
+	fMidiPtrs->midiOutLocProd = new BMidiLocalProducer("QMidi");
+	if (!fMidiPtrs->midiOutLocProd->IsValid()) {
+		fMidiPtrs->midiOutLocProd->Release();
 		return false;
 	}
-	myMidiPtrs->midiOutLocProd->Register();
-	if (myMidiPtrs->midiOutLocProd->Connect(myMidiPtrs->midiOutConsumer) != B_OK) {
+	fMidiPtrs->midiOutLocProd->Register();
+	if (fMidiPtrs->midiOutLocProd->Connect(fMidiPtrs->midiOutConsumer) != B_OK) {
 		return false;
 	}
 
-	myDeviceId = outDeviceId;
-	myConnected = true;
+	fDeviceId = outDeviceId;
+	fConnected = true;
 	return true;
 }
 
 void QMidiOut::disconnect()
 {
-	if (!myConnected) {
+	if (!fConnected) {
 		return;
 	}
 
-	myMidiPtrs->midiOutLocProd->Disconnect(myMidiPtrs->midiOutConsumer);
-	myMidiPtrs->midiOutConsumer->Release();
-	myMidiPtrs->midiOutLocProd->Unregister();
-	myMidiPtrs->midiOutLocProd->Release();
+	fMidiPtrs->midiOutLocProd->Disconnect(fMidiPtrs->midiOutConsumer);
+	fMidiPtrs->midiOutConsumer->Release();
+	fMidiPtrs->midiOutLocProd->Unregister();
+	fMidiPtrs->midiOutLocProd->Release();
 
-	delete myMidiPtrs;
-	myMidiPtrs = NULL;
-	myConnected = false;
+	delete fMidiPtrs;
+	fMidiPtrs = NULL;
+	fConnected = false;
 }
 
 void QMidiOut::sendMsg(qint32 msg)
 {
-	if (!myConnected) {
+	if (!fConnected) {
 		return;
 	}
 
@@ -85,5 +85,5 @@ void QMidiOut::sendMsg(qint32 msg)
 	buf[1] = (msg >> 8) & 0xFF;
 	buf[2] = (msg >> 16) & 0xFF;
 
-	myMidiPtrs->midiOutLocProd->SprayData((void*)&buf, 3, true);
+	fMidiPtrs->midiOutLocProd->SprayData((void*)&buf, 3, true);
 }

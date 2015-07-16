@@ -11,7 +11,7 @@
 QMidiOut::QMidiOut(QObject* parent)
 	: QObject(parent)
 {
-	myConnected = false;
+	fConnected = false;
 }
 
 void QMidiOut::sendEvent(QMidiEvent* e)

@@ -56,49 +56,49 @@ QMap<QString, QString> QMidiOut::devices()
 
 bool QMidiOut::connect(QString outDeviceId)
 {
-	if (myConnected)
+	if (fConnected)
 		disconnect();
-	myMidiPtrs = new MidiPtrObjs;
+	fMidiPtrs = new MidiPtrObjs;
 
-	int err = snd_seq_open(&myMidiPtrs->midiOutPtr, "default", SND_SEQ_OPEN_OUTPUT, 0);
+	int err = snd_seq_open(&fMidiPtrs->midiOutPtr, "default", SND_SEQ_OPEN_OUTPUT, 0);
 	if (err < 0) {
 		return false;
 	}
-	snd_seq_set_client_name(myMidiPtrs->midiOutPtr, "QtMidi");
+	snd_seq_set_client_name(fMidiPtrs->midiOutPtr, "QtMidi");
 
-	snd_seq_create_simple_port(myMidiPtrs->midiOutPtr, "Output Port", SND_SEQ_PORT_CAP_READ,
+	snd_seq_create_simple_port(fMidiPtrs->midiOutPtr, "Output Port", SND_SEQ_PORT_CAP_READ,
 							   SND_SEQ_PORT_TYPE_MIDI_GENERIC);
 
 	QStringList l = outDeviceId.split(":");
 	int client = l.at(0).toInt();
 	int port = l.at(1).toInt();
-	snd_seq_connect_to(myMidiPtrs->midiOutPtr, 0, client, port);
+	snd_seq_connect_to(fMidiPtrs->midiOutPtr, 0, client, port);
 
-	myDeviceId = outDeviceId;
-	myConnected = true;
+	fDeviceId = outDeviceId;
+	fConnected = true;
 	return true;
 }
 
 void QMidiOut::disconnect()
 {
-	if (!myConnected) {
+	if (!fConnected) {
 		return;
 	}
 
-	QStringList l = myDeviceId.split(":");
+	QStringList l = fDeviceId.split(":");
 	int client = l.at(0).toInt();
 	int port = l.at(1).toInt();
 
-	snd_seq_disconnect_from(myMidiPtrs->midiOutPtr, 0, client, port);
+	snd_seq_disconnect_from(fMidiPtrs->midiOutPtr, 0, client, port);
 
-	delete myMidiPtrs;
-	myMidiPtrs = NULL;
-	myConnected = false;
+	delete fMidiPtrs;
+	fMidiPtrs = NULL;
+	fConnected = false;
 }
 
 void QMidiOut::sendMsg(qint32 msg)
 {
-	if (!myConnected) {
+	if (!fConnected) {
 		return;
 	}
 
@@ -119,6 +119,6 @@ void QMidiOut::sendMsg(qint32 msg)
 	snd_midi_event_resize_buffer(mev, 3);
 	snd_midi_event_encode(mev, (unsigned char*)&buf, 3, &ev);
 
-	snd_seq_event_output(myMidiPtrs->midiOutPtr, &ev);
-	snd_seq_drain_output(myMidiPtrs->midiOutPtr);
+	snd_seq_event_output(fMidiPtrs->midiOutPtr, &ev);
+	snd_seq_drain_output(fMidiPtrs->midiOutPtr);
 }

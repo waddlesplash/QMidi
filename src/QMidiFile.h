@@ -36,65 +36,65 @@ public:
 
 	QMidiEvent();
 
-	inline EventType type() { return myType; }
-	inline void setType(EventType newType) { myType = newType; }
+	inline EventType type() { return fType; }
+	inline void setType(EventType newType) { fType = newType; }
 
-	inline qint32 tick() { return myTick; }
-	inline void setTick(qint32 tick) { myTick = tick; }
+	inline qint32 tick() { return fTick; }
+	inline void setTick(qint32 tick) { fTick = tick; }
 	/* you MUST run the QtMidiFile's sort() function after changing ticks! */
 	/* otherwise, it will not play or write the file properly! */
 
-	inline int track() { return myTrackNumber; }
-	inline void setTrack(int trackNumber) { myTrackNumber = trackNumber; }
+	inline int track() { return fTrackNumber; }
+	inline void setTrack(int trackNumber) { fTrackNumber = trackNumber; }
 
-	inline int voice() { return myVoice; }
-	inline void setVoice(int voice) { myVoice = voice; }
+	inline int voice() { return fVoice; }
+	inline void setVoice(int voice) { fVoice = voice; }
 
-	inline int note() { return myNote; }
-	inline void setNote(int note) { myNote = note; }
+	inline int note() { return fNote; }
+	inline void setNote(int note) { fNote = note; }
 
-	inline int velocity() { return myVelocity; }
-	inline void setVelocity(int velocity) { myVelocity = velocity; }
+	inline int velocity() { return fVelocity; }
+	inline void setVelocity(int velocity) { fVelocity = velocity; }
 
-	inline int amount() { return myAmount; }
-	inline void setAmount(int amount) { myAmount = amount; }
+	inline int amount() { return fAmount; }
+	inline void setAmount(int amount) { fAmount = amount; }
 
-	inline int number() { return myNumber; }
-	inline void setNumber(int number) { myNumber = number; }
+	inline int number() { return fNumber; }
+	inline void setNumber(int number) { fNumber = number; }
 
-	inline int value() { return myValue; }
-	inline void setValue(int value) { myValue = value; }
+	inline int value() { return fValue; }
+	inline void setValue(int value) { fValue = value; }
 
 	float tempo();
 
-	inline int numerator() { return myNumerator; }
-	inline void setNumerator(int numerator) { myNumerator = numerator; }
+	inline int numerator() { return fNumerator; }
+	inline void setNumerator(int numerator) { fNumerator = numerator; }
 
-	inline int denominator() { return myDenominator; }
-	inline void setDenominator(int denominator) { myDenominator = denominator; }
+	inline int denominator() { return fDenominator; }
+	inline void setDenominator(int denominator) { fDenominator = denominator; }
 
-	inline QByteArray data() { return myData; }
-	inline void setData(QByteArray data) { myData = data; }
+	inline QByteArray data() { return fData; }
+	inline void setData(QByteArray data) { fData = data; }
 
 	quint32 message();
 	void setMessage(quint32 data);
 
-	inline bool isNoteEvent() { return ((myType == NoteOn) || (myType == NoteOff)); }
+	inline bool isNoteEvent() { return ((fType == NoteOn) || (fType == NoteOff)); }
 
 private:
-	int myVoice;
-	int myNote;
-	int myVelocity;
-	int myAmount;	  // KeyPressure, ChannelPressure
-	int myNumber;	  // ControlChange, ProgramChange, Meta
-	int myValue;	   // PitchWheel, ControlChange
-	int myNumerator;   // TimeSignature
-	int myDenominator; // TimeSignature
-	QByteArray myData; // Meta, SysEx
+	int fVoice;
+	int fNote;
+	int fVelocity;
+	int fAmount;	  // KeyPressure, ChannelPressure
+	int fNumber;	  // ControlChange, ProgramChange, Meta
+	int fValue;	   // PitchWheel, ControlChange
+	int fNumerator;   // TimeSignature
+	int fDenominator; // TimeSignature
+	QByteArray fData; // Meta, SysEx
 
-	qint32 myTick;
-	EventType myType;
-	int myTrackNumber;
+	qint32 fTick;
+	EventType fType;
+	int fTrackNumber;
 };
 
 class QMidiFile
@@ -121,17 +121,17 @@ public:
 
 	void sort();
 
-	inline void setFileFormat(int fileFormat) { myFileFormat = fileFormat; }
-	inline int fileFormat() { return myFileFormat; }
+	inline void setFileFormat(int fileFormat) { fFileFormat = fileFormat; }
+	inline int fileFormat() { return fFileFormat; }
 
 	inline bool sortDisabled() { return disableSort; }
 	inline void setSortDisabled(bool disabled) { disableSort = disabled; }
 
-	inline void setResolution(int resolution) { myResolution = resolution; }
-	inline int resolution() { return myResolution; }
+	inline void setResolution(int resolution) { fResolution = resolution; }
+	inline int resolution() { return fResolution; }
 
-	inline void setDivisionType(DivisionType type) { myDivType = type; }
-	inline DivisionType divisionType() { return myDivType; }
+	inline void setDivisionType(DivisionType type) { fDivType = type; }
+	inline DivisionType divisionType() { return fDivType; }
 
 	void addEvent(qint32 tick, QMidiEvent* e);
 	void removeEvent(QMidiEvent* e);
@@ -139,7 +139,7 @@ public:
 	int createTrack();
 	void removeTrack(int track);
 	qint32 trackEndTick(int track);
-	inline QList<int> tracks() { return myTracks; }
+	inline QList<int> tracks() { return fTracks; }
 
 	QMidiEvent* createNoteOnEvent(int track, qint32 tick, int voice, int note, int velocity);
 	QMidiEvent* createNoteOffEvent(int track, qint32 tick, int voice, int note, int velocity = 64);
@@ -162,7 +162,7 @@ public:
 	QMidiEvent* createMarkerEvent(int track, qint32 tick, QByteArray text);
 	QMidiEvent* createVoiceEvent(int track, qint32 tick, quint32 data);
 
-	inline QList<QMidiEvent*>* events() { return &myEvents; }
+	inline QList<QMidiEvent*>* events() { return &fEvents; }
 	QList<QMidiEvent*> events(int voice);
 	QList<QMidiEvent*> eventsForTrack(int track);
 
@@ -172,11 +172,11 @@ public:
 	qint32 tickFromBeat(float beat);
 
 private:
-	QList<QMidiEvent*> myEvents;
-	QList<QMidiEvent*> myTempoEvents;
-	QList<int> myTracks;
-	DivisionType myDivType;
-	int myResolution;
-	int myFileFormat;
+	QList<QMidiEvent*> fEvents;
+	QList<QMidiEvent*> fTempoEvents;
+	QList<int> fTracks;
+	DivisionType fDivType;
+	int fResolution;
+	int fFileFormat;
 	bool disableSort;
 };

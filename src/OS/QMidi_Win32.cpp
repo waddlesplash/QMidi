@@ -37,35 +37,35 @@ QMap<QString, QString> QMidiOut::devices()
 
 bool QMidiOut::connect(QString outDeviceId)
 {
-	if (myConnected)
+	if (fConnected)
 		disconnect();
-	myMidiPtrs = new MidiPtrObjs;
+	fMidiPtrs = new MidiPtrObjs;
 
-	midiOutOpen(&myMidiPtrs->midiOutPtr, outDeviceId.toInt(), 0, 0, CALLBACK_NULL);
+	midiOutOpen(&fMidiPtrs->midiOutPtr, outDeviceId.toInt(), 0, 0, CALLBACK_NULL);
 
-	myDeviceId = outDeviceId;
-	myConnected = true;
+	fDeviceId = outDeviceId;
+	fConnected = true;
 	return true;
 }
 
 void QMidiOut::disconnect()
 {
-	if (!myConnected) {
+	if (!fConnected) {
 		return;
 	}
 
-	midiOutClose(myMidiPtrs->midiOutPtr);
+	midiOutClose(fMidiPtrs->midiOutPtr);
 
-	delete myMidiPtrs;
-	myMidiPtrs = NULL;
-	myConnected = false;
+	delete fMidiPtrs;
+	fMidiPtrs = NULL;
+	fConnected = false;
 }
 
 void QMidiOut::sendMsg(qint32 msg)
 {
-	if (!myConnected) {
+	if (!fConnected) {
 		return;
 	}
 
-	midiOutShortMsg(myMidiPtrs->midiOutPtr, (DWORD)msg);
+	midiOutShortMsg(fMidiPtrs->midiOutPtr, (DWORD)msg);
 }

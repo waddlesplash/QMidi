@@ -10,18 +10,18 @@
 
 QMidiEvent::QMidiEvent()
 {
-	myTrackNumber = -1;
-	myType = Invalid;
-	myVoice = -1;
-	myNote = -1;
-	myVelocity = -1;
-	myAmount = -1;
-	myNumber = -1;
-	myValue = -1;
-	myNumerator = -1;
-	myDenominator = -1;
-	myData = "";
-	myTick = -1;
+	fTrackNumber = -1;
+	fType = Invalid;
+	fVoice = -1;
+	fNote = -1;
+	fVelocity = -1;
+	fAmount = -1;
+	fNumber = -1;
+	fValue = -1;
+	fNumerator = -1;
+	fDenominator = -1;
+	fData = "";
+	fTick = -1;
 }
 
 quint32 QMidiEvent::message()
@@ -31,53 +31,53 @@ quint32 QMidiEvent::message()
 		quint32 data_as_uint32;
 	} u;
 
-	switch (myType) {
+	switch (fType) {
 	case NoteOff:
-		u.data_as_bytes[0] = 0x80 | myVoice;
-		u.data_as_bytes[1] = myNote;
+		u.data_as_bytes[0] = 0x80 | fVoice;
+		u.data_as_bytes[1] = fNote;
 		u.data_as_bytes[2] = 0;
 		u.data_as_bytes[3] = 0;
 		break;
 
 	case NoteOn:
-		u.data_as_bytes[0] = 0x90 | myVoice;
-		u.data_as_bytes[1] = myNote;
-		u.data_as_bytes[2] = myVelocity;
+		u.data_as_bytes[0] = 0x90 | fVoice;
+		u.data_as_bytes[1] = fNote;
+		u.data_as_bytes[2] = fVelocity;
 		u.data_as_bytes[3] = 0;
 		break;
 
 	case KeyPressure:
-		u.data_as_bytes[0] = 0xA0 | myVoice;
-		u.data_as_bytes[1] = myNote;
-		u.data_as_bytes[2] = myAmount;
+		u.data_as_bytes[0] = 0xA0 | fVoice;
+		u.data_as_bytes[1] = fNote;
+		u.data_as_bytes[2] = fAmount;
 		u.data_as_bytes[3] = 0;
 		break;
 
 	case ControlChange:
-		u.data_as_bytes[0] = 0xB0 | myVoice;
-		u.data_as_bytes[1] = myNumber;
-		u.data_as_bytes[2] = myValue;
+		u.data_as_bytes[0] = 0xB0 | fVoice;
+		u.data_as_bytes[1] = fNumber;
+		u.data_as_bytes[2] = fValue;
 		u.data_as_bytes[3] = 0;
 		break;
 
 	case ProgramChange:
-		u.data_as_bytes[0] = 0xC0 | myVoice;
-		u.data_as_bytes[1] = myNumber;
+		u.data_as_bytes[0] = 0xC0 | fVoice;
+		u.data_as_bytes[1] = fNumber;
 		u.data_as_bytes[2] = 0;
 		u.data_as_bytes[3] = 0;
 		break;
 
 	case ChannelPressure:
-		u.data_as_bytes[0] = 0xD0 | myVoice;
-		u.data_as_bytes[1] = myAmount;
+		u.data_as_bytes[0] = 0xD0 | fVoice;
+		u.data_as_bytes[1] = fAmount;
 		u.data_as_bytes[2] = 0;
 		u.data_as_bytes[3] = 0;
 		break;
 
 	case PitchWheel:
-		u.data_as_bytes[0] = 0xE0 | myVoice;
-		u.data_as_bytes[2] = myValue >> 7;
-		u.data_as_bytes[1] = myValue;
+		u.data_as_bytes[0] = 0xE0 | fVoice;
+		u.data_as_bytes[2] = fValue >> 7;
+		u.data_as_bytes[1] = fValue;
 		u.data_as_bytes[3] = 0;
 		break;
 
@@ -152,11 +152,11 @@ float QMidiEvent::tempo()
 	unsigned char* buffer;
 	qint32 midi_tempo = 0;
 
-	if ((myType != Meta) || (myNumber != Tempo)) {
+	if ((fType != Meta) || (fNumber != Tempo)) {
 		return -1;
 	}
 
-	buffer = (unsigned char*)myData.constData();
+	buffer = (unsigned char*)fData.constData();
 	midi_tempo = (buffer[0] << 16) | (buffer[1] << 8) | buffer[2];
 	return (float)(60000000.0 / midi_tempo);
 }
@@ -165,16 +165,16 @@ float QMidiEvent::tempo()
 
 QMidiFile::QMidiFile()
 {
-	myDivType = PPQ;
-	myFileFormat = 1;
-	myResolution = 0;
+	fDivType = PPQ;
+	fFileFormat = 1;
+	fResolution = 0;
 	disableSort = false;
 }
 
 QMidiFile::~QMidiFile()
 {
-	for (int i = 0; i < myEvents.size(); i++) {
-		QMidiEvent* e = myEvents.at(i);
+	for (int i = 0; i < fEvents.size(); i++) {
+		QMidiEvent* e = fEvents.at(i);
 		delete e;
 	}
 }
@@ -188,21 +188,21 @@ bool isGreaterThan(QMidiEvent* e1, QMidiEvent* e2)
 
 QMidiFile* QMidiFile::oneTrackPerVoice()
 {
-	if (myFileFormat != 0) {
+	if (fFileFormat != 0) {
 		return 0;
 	}
 	QMidiFile* ret = new QMidiFile();
 
-	ret->setDivisionType(myDivType);
-	ret->setResolution(myResolution);
+	ret->setDivisionType(fDivType);
+	ret->setResolution(fResolution);
 	ret->setFileFormat(1);
 
 	QMap<int /*voice*/, int /*track*/> tracks;
 	ret->createTrack(); /* Track 0 */
 	ret->setSortDisabled(true);
-	for (int i = 0; i < myEvents.size(); i++) {
+	for (int i = 0; i < fEvents.size(); i++) {
 		QMidiEvent* e = new QMidiEvent();
-		*e = *(myEvents.at(i)); /* copy data buffer */
+		*e = *(fEvents.at(i)); /* copy data buffer */
 		if ((e->type() == QMidiEvent::Meta) && (e->number() == QMidiEvent::TrackName)) {
 			e->setTrack(1);
 			ret->addEvent(e->tick(), e);
@@ -228,31 +228,31 @@ void QMidiFile::sort()
 	if (disableSort) {
 		return;
 	}
-	qStableSort(myEvents.begin(), myEvents.end(), isGreaterThan);
-	qStableSort(myTempoEvents.begin(), myTempoEvents.end(), isGreaterThan);
+	qStableSort(fEvents.begin(), fEvents.end(), isGreaterThan);
+	qStableSort(fTempoEvents.begin(), fTempoEvents.end(), isGreaterThan);
 }
 
 void QMidiFile::addEvent(qint32 tick, QMidiEvent* e)
 {
 	e->setTick(tick);
-	myEvents.append(e);
+	fEvents.append(e);
 	if ((e->track() == 0) && (e->number() == QMidiEvent::Tempo)) {
-		myTempoEvents.append(e);
+		fTempoEvents.append(e);
 	}
 	sort();
 }
 void QMidiFile::removeEvent(QMidiEvent* e)
 {
-	myEvents.removeOne(e);
+	fEvents.removeOne(e);
 	if ((e->track() == 0) && (e->number() == QMidiEvent::Tempo)) {
-		myTempoEvents.removeOne(e);
+		fTempoEvents.removeOne(e);
 	}
 }
 
 QList<QMidiEvent*> QMidiFile::eventsForTrack(int track)
 {
 	QList<QMidiEvent*> ret;
-	foreach (QMidiEvent* e, myEvents) {
+	foreach (QMidiEvent* e, fEvents) {
 		if (e->track() == track) {
 			ret.append(e);
 		}
@@ -263,7 +263,7 @@ QList<QMidiEvent*> QMidiFile::eventsForTrack(int track)
 QList<QMidiEvent*> QMidiFile::events(int voice)
 {
 	QList<QMidiEvent*> ret;
-	foreach (QMidiEvent* e, myEvents) {
+	foreach (QMidiEvent* e, fEvents) {
 		if (e->voice() == voice) {
 			ret.append(e);
 		}
@@ -273,22 +273,22 @@ QList<QMidiEvent*> QMidiFile::events(int voice)
 
 int QMidiFile::createTrack()
 {
-	int t = myTracks.count();
-	myTracks.append(t);
+	int t = fTracks.count();
+	fTracks.append(t);
 	return t;
 }
 
 void QMidiFile::removeTrack(int track)
 {
-	if (myTracks.contains(track)) {
-		myTracks.removeOne(track);
+	if (fTracks.contains(track)) {
+		fTracks.removeOne(track);
 	}
 }
 
 qint32 QMidiFile::trackEndTick(int track)
 {
-	for (int i = myEvents.size() - 1; i >= 0; i--) {
-		QMidiEvent* e = myEvents.at(i);
+	for (int i = fEvents.size() - 1; i >= 0; i--) {
+		QMidiEvent* e = fEvents.at(i);
 		if (e->track() == track) {
 			return e->tick();
 		}
@@ -450,34 +450,34 @@ QMidiEvent* QMidiFile::createVoiceEvent(int track, qint32 tick, quint32 data)
 
 float QMidiFile::timeFromTick(qint32 tick)
 {
-	switch (myDivType) {
+	switch (fDivType) {
 	case PPQ: {
 		float tempo_event_time = 0.0;
 		qint32 tempo_event_tick = 0;
 		float tempo = 120.0;
 
-		foreach (QMidiEvent* e, myTempoEvents) {
+		foreach (QMidiEvent* e, fTempoEvents) {
 			if (e->tick() >= tick) {
 				break;
 			}
 			tempo_event_time +=
-				(((float)(e->tick() - tempo_event_tick)) / myResolution / (tempo / 60));
+				(((float)(e->tick() - tempo_event_tick)) / fResolution / (tempo / 60));
 			tempo_event_tick = e->tick();
 			tempo = e->tempo();
 		}
 
 		float time =
-			tempo_event_time + (((float)(tick - tempo_event_tick)) / myResolution / (tempo / 60));
+			tempo_event_time + (((float)(tick - tempo_event_tick)) / fResolution / (tempo / 60));
 		return time;
 	}
 	case SMPTE24:
-		return (float)(tick) / (myResolution * 24.0);
+		return (float)(tick) / (fResolution * 24.0);
 	case SMPTE25:
-		return (float)(tick) / (myResolution * 25.0);
+		return (float)(tick) / (fResolution * 25.0);
 	case SMPTE30DROP:
-		return (float)(tick) / (myResolution * 29.97);
+		return (float)(tick) / (fResolution * 29.97);
 	case SMPTE30:
-		return (float)(tick) / (myResolution * 30.0);
+		return (float)(tick) / (fResolution * 30.0);
 	default:
 		return -1;
 	}
@@ -485,32 +485,32 @@ float QMidiFile::timeFromTick(qint32 tick)
 
 qint32 QMidiFile::tickFromTime(float time)
 {
-	switch (myDivType) {
+	switch (fDivType) {
 	case PPQ: {
 		float tempo_event_time = 0.0;
 		qint32 tempo_event_tick = 0;
 		float tempo = 120.0;
 
-		foreach (QMidiEvent* e, myTempoEvents) {
+		foreach (QMidiEvent* e, fTempoEvents) {
 			float next_tempo_event_time =
 				tempo_event_time +
-				(((float)(e->tick() - tempo_event_tick)) / myResolution / (tempo / 60));
+				(((float)(e->tick() - tempo_event_tick)) / fResolution / (tempo / 60));
 			if (next_tempo_event_time >= time) break;
 			tempo_event_time = next_tempo_event_time;
 			tempo_event_tick = e->tick();
 			tempo = e->tempo();
 		}
 
-		return tempo_event_tick + (qint32)((time - tempo_event_time) * (tempo / 60) * myResolution);
+		return tempo_event_tick + (qint32)((time - tempo_event_time) * (tempo / 60) * fResolution);
 	}
 	case SMPTE24:
-		return (qint32)(time * myResolution * 24.0);
+		return (qint32)(time * fResolution * 24.0);
 	case SMPTE25:
-		return (qint32)(time * myResolution * 25.0);
+		return (qint32)(time * fResolution * 25.0);
 	case SMPTE30DROP:
-		return (qint32)(time * myResolution * 29.97);
+		return (qint32)(time * fResolution * 29.97);
 	case SMPTE30:
-		return (qint32)(time * myResolution * 30.0);
+		return (qint32)(time * fResolution * 30.0);
 	default:
 		return -1;
 	}
@@ -518,9 +518,9 @@ qint32 QMidiFile::tickFromTime(float time)
 
 float QMidiFile::beatFromTick(qint32 tick)
 {
-	switch (myDivType) {
+	switch (fDivType) {
 	case PPQ:
-		return (float)(tick) / myResolution;
+		return (float)(tick) / fResolution;
 	case SMPTE24:
 		return (float)(tick) / 24.0;
 	case SMPTE25:
@@ -536,9 +536,9 @@ float QMidiFile::beatFromTick(qint32 tick)
 
 qint32 QMidiFile::tickFromBeat(float beat)
 {
-	switch (myDivType) {
+	switch (fDivType) {
 	case PPQ:
-		return (qint32)(beat * myResolution);
+		return (qint32)(beat * fResolution);
 	case SMPTE24:
 		return (qint32)(beat * 24.0);
 	case SMPTE25:
@@ -680,33 +680,33 @@ bool QMidiFile::load(QString filename)
 
 	switch ((signed char)(division_type_and_resolution[0])) {
 	case SMPTE24: {
-		myFileFormat = file_format;
-		myDivType = SMPTE24;
-		myResolution = division_type_and_resolution[1];
+		fFileFormat = file_format;
+		fDivType = SMPTE24;
+		fResolution = division_type_and_resolution[1];
 		break;
 	}
 	case SMPTE25: {
-		myFileFormat = file_format;
-		myDivType = SMPTE25;
-		myResolution = division_type_and_resolution[1];
+		fFileFormat = file_format;
+		fDivType = SMPTE25;
+		fResolution = division_type_and_resolution[1];
 		break;
 	}
 	case SMPTE30DROP: {
-		myFileFormat = file_format;
-		myDivType = SMPTE30DROP;
-		myResolution = division_type_and_resolution[1];
+		fFileFormat = file_format;
+		fDivType = SMPTE30DROP;
+		fResolution = division_type_and_resolution[1];
 		break;
 	}
 	case SMPTE30: {
-		myFileFormat = file_format;
-		myDivType = SMPTE30;
-		myResolution = division_type_and_resolution[1];
+		fFileFormat = file_format;
+		fDivType = SMPTE30;
+		fResolution = division_type_and_resolution[1];
 		break;
 	}
 	default: {
-		myFileFormat = file_format;
-		myDivType = PPQ;
-		myResolution = interpret_uint16(division_type_and_resolution);
+		fFileFormat = file_format;
+		fDivType = PPQ;
+		fResolution = interpret_uint16(division_type_and_resolution);
 		break;
 	}
 	}
@@ -867,20 +867,20 @@ bool QMidiFile::save(QString filename)
 
 	out.write("MThd", 4);
 	write_uint32(&out, 6);
-	write_uint16(&out, (quint16)(myFileFormat));
-	write_uint16(&out, (quint16)(myTracks.size()));
+	write_uint16(&out, (quint16)(fFileFormat));
+	write_uint16(&out, (quint16)(fTracks.size()));
 
-	switch (myDivType) {
+	switch (fDivType) {
 	case PPQ:
-		write_uint16(&out, (quint16)(myResolution));
+		write_uint16(&out, (quint16)(fResolution));
 		break;
 	default:
-		out.putChar(myDivType);
-		out.putChar(myResolution);
+		out.putChar(fDivType);
+		out.putChar(fResolution);
 		break;
 	}
 
-	foreach (curTrack, myTracks) {
+	foreach (curTrack, fTracks) {
 		QMidiEvent* e;
 		qint32 track_size_offset, track_start_offset, track_end_offset, tick, previous_tick;
 
