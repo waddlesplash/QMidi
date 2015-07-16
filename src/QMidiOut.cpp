@@ -1,5 +1,4 @@
 /*
- * Copyright 2003-2012 by David G. Slomin
  * Copyright 2012-2015 Augustin Cavalier <waddlesplash>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
