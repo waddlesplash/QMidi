@@ -9,7 +9,7 @@
 #include <QString>
 
 class QMidiEvent;
-struct MidiPtrObjs;
+struct NativeMidiInstances;
 
 class QMidiOut : public QObject
 {
@@ -36,6 +36,6 @@ signals:
 
 private:
 	QString fDeviceId;
-	MidiPtrObjs* fMidiPtrs;
+	NativeMidiInstances* fMidiPtrs;
 	bool fConnected;
 };

@@ -9,7 +9,7 @@
 #include <alsa/asoundlib.h>
 #include <alsa/seq.h>
 #include <alsa/seq_midi_event.h>
-struct MidiPtrObjs {
+struct NativeMidiInstances {
 	snd_seq_t* midiOutPtr;
 };
 
@@ -58,7 +58,7 @@ bool QMidiOut::connect(QString outDeviceId)
 {
 	if (fConnected)
 		disconnect();
-	fMidiPtrs = new MidiPtrObjs;
+	fMidiPtrs = new NativeMidiInstances;
 
 	int err = snd_seq_open(&fMidiPtrs->midiOutPtr, "default", SND_SEQ_OPEN_OUTPUT, 0);
 	if (err < 0) {
