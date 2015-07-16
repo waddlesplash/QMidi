@@ -41,7 +41,7 @@ public:
 
 	inline qint32 tick() { return fTick; }
 	inline void setTick(qint32 tick) { fTick = tick; }
-	/* you MUST run the QtMidiFile's sort() function after changing ticks! */
+	/* you MUST run the QMidiFile's sort() function after changing ticks! */
 	/* otherwise, it will not play or write the file properly! */
 
 	inline int track() { return fTrackNumber; }

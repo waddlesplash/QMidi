@@ -841,9 +841,8 @@ bool QMidiFile::load(QString filename)
 			number_of_tracks_read++;
 		}
 
-		/* forwards compatibility:  skip over any unrecognized chunks, or extra
-		 * data
-		 * at the end of tracks */
+		/* forwards compatibility: skip over any unrecognized chunks, or extra
+		 * data at the end of tracks. */
 		in.seek(chunk_start + chunk_size);
 	}
 
