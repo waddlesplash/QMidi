@@ -1,31 +1,29 @@
 # QMidi [![Build Status](https://travis-ci.org/waddlesplash/qtmidi.png)](https://travis-ci.org/waddlesplash/qtmidi)
-A simple, cross-platform way to support MIDI. Classes for MIDI Output and MIDI File I/O are supported.
-MIDI output is supported on Windows (via `mmsystem`), Linux (via `ALSA`), and Haiku (via `MidiKit2`).
+A simple, cross-platform way to support MIDI in Qt. MIDI Output and MIDI File I/O is supported.
+MIDI output is supported on Windows (Windows Multimedia), Linux (ALSA), and Haiku
+(Midi Kit 2).
 
 ## MIDI Output
-To output MIDI, simply initialize the `QMidiOut` class...
+The `QMidiOut` class provides an interface to the system's MIDI Out.
 ```cpp
-QMap<QString,QString> vals = QMidiOut::devices();
-/* outDeviceNames() returns a QMap where the key is the ID and
+/* devices() returns a QMap where the key is the ID and
  * the value is the user-friendly name. */
+QMap<QString, QString> vals = QMidiOut::devices();
 QMidiOut midi;
-midi.connect("key goes here");
+midi.connect(/* one of the keys (IDs) from `devices()` */);
 ```
-...and then send messages:
+There's an easy API for sending messages:
 ```cpp
-midi.setInstrument(0, 0);
-/* Voice (0-15), Instrument (0-127) */
-midi.noteOn(60,0);
-/* Note (0-127), Voice (0-15) [, Velocity (0-127)] */
-midi.noteOff(60,0);
-/* Note (0-127), Voice (0-15) */
+midi.setInstrument(/* voice */ 0, /* instrument */ 0);
+midi.noteOn(/* note */ 60, /* voice */ 0 /* , velocity */);
+midi.noteOff(/* note */ 60, /* voice */ 0);
 ```
-Alternatively, you could just send MIDI note data:
+Alternatively, you could just send raw MIDI messages:
 ```cpp
-midi.sendMsg(0x90+0 | 60<<8 | 64<<16);
+midi.sendMsg(0x90 + 0 | 60 << 8 | 64 << 16);
 /* note on, voice 0; middle C (60); velocity 64 */
 ```
-Or construct a QMidiEvent (from `QMidiFile.h`) and send it:
+Or you could construct a QMidiEvent (from `QMidiFile.h`) and send it:
 ```cpp
 QMidiEvent* e = new QMidiEvent();
 e->setType(QMidiEvent::NoteOn);
@@ -34,18 +32,22 @@ e->setNote(60);
 e->setVelocity(64);
 midi.sendEvent(e);
 ```
-Before your application closes or if you want to open output on a different port...
+Once you're done:
 ```cpp
 midi.disconnect();
 ```
 
 ## MIDI File I/O
-Classes for MIDI file I/O were rewritten from Div's Midi Utilities ([homepage](http://www.sreal.com/~div/midi-utilities/) | [Google Code](http://code.google.com/p/divs-midi-utilities/)) into Qt/C++.
+Classes for MIDI file I/O were rewritten from Div's Midi Utilities
+([homepage](http://www.sreal.com/~div/midi-utilities/) | [Google Code](http://code.google.com/p/divs-midi-utilities/))
+from C to Qt/C++.
 
-Use the classes like so:
+Quick example:
 ```cpp
 QMidiFile f;
 f.load(" .. some filename .. ");
 f.save(" .. some filename .. ");
 ```
-You can get the events using `f.events()` which returns a `QList<QMidiEvent*>*`. For information on using these classes in conjuction with the MIDI output class to play files, see the `qtplaysmf` example in the `examples` folder.
+You can get the events using `f.events()` which returns a `QList<QMidiEvent*>*`.
+For information on using these classes in conjuction with the MIDI output class to play files
+see the `qtplaysmf` example in the `examples` folder.
