@@ -3,10 +3,11 @@ language: cpp
 compiler: gcc
 addons:
   apt:
-    sources:
+    packages:
     - libqt4-dev
     - libasound2-dev
-script:
+install:
  - cd examples/qtplaysmf/
+script:
  - qmake -spec linux-g++ .
  - make
