@@ -3,8 +3,7 @@
  * Copyright 2012-2015 Augustin Cavalier <waddlesplash>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
-#ifndef QMIDIOUT_H
-#define QMIDIOUT_H
+#pragma once
 
 #include <QObject>
 #include <QMap>
@@ -41,5 +40,3 @@ private:
 	MidiPtrObjs* myMidiPtrs;
 	bool myConnected;
 };
-
-#endif // QMIDIOUT_H

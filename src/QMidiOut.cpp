@@ -5,8 +5,9 @@
  */
 #include "QMidiOut.h"
 
-#include <QStringList>
 #include "QMidiFile.h"
+
+#include <QStringList>
 
 #if defined(Q_OS_WIN)
 #include <windows.h>

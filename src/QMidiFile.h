@@ -3,8 +3,7 @@
  * Copyright 2012-2015 Augustin Cavalier <waddlesplash>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
-#ifndef QMIDIFILE_H
-#define QMIDIFILE_H
+#pragma once
 
 #include <QString>
 #include <QMap>
@@ -181,5 +180,3 @@ private:
 	int myFileFormat;
 	bool disableSort;
 };
-
-#endif // QTMIDIFILE_H
