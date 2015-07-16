@@ -21,8 +21,8 @@ public:
 	bool connect(QString outDeviceId);
 	void disconnect();
 	void sendMsg(qint32 msg);
-	void sendEvent(QMidiEvent* e);
 
+	void sendEvent(QMidiEvent* e);
 	void setInstr(int voice, int instr);
 	void noteOn(int note, int voice, int velocity = 64);
 	void noteOff(int note, int voice);

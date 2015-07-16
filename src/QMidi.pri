@@ -1,7 +1,3 @@
-win32 { LIBS += -lwinmm }
-linux* { LIBS += -lasound }
-haiku* { LIBS += -lmidi2 }
-
 INCLUDEPATH += $$PWD
 
 SOURCES += $$PWD/QMidiOut.cpp \
@@ -9,3 +5,18 @@ SOURCES += $$PWD/QMidiOut.cpp \
 
 HEADERS += $$PWD/QMidiOut.h \
 	$$PWD/QMidiFile.h
+
+win32 {
+	LIBS += -lwinmm
+	SOURCES += $$PWD/OS/QMidi_Win32.cpp
+}
+
+linux* {
+	LIBS += -lasound
+	SOURCES += $$PWD/OS/QMidi_ALSA.cpp
+}
+
+haiku* {
+	LIBS += -lmidi2
+	SOURCES += $$PWD/OS/QMidi_Haiku.cpp
+}
