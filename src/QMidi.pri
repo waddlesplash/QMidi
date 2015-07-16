@@ -1,5 +1,7 @@
-INCLUDEPATH += $$PWD
+# QMidi include file for QMake
+CONFIG += c++11
 
+INCLUDEPATH += $$PWD
 SOURCES += $$PWD/QMidiOut.cpp \
 	$$PWD/QMidiFile.cpp
 

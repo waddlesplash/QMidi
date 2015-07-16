@@ -252,7 +252,7 @@ void QMidiFile::removeEvent(QMidiEvent* e)
 QList<QMidiEvent*> QMidiFile::eventsForTrack(int track)
 {
 	QList<QMidiEvent*> ret;
-	foreach (QMidiEvent* e, fEvents) {
+	for (QMidiEvent* e : fEvents) {
 		if (e->track() == track) {
 			ret.append(e);
 		}
@@ -263,7 +263,7 @@ QList<QMidiEvent*> QMidiFile::eventsForTrack(int track)
 QList<QMidiEvent*> QMidiFile::events(int voice)
 {
 	QList<QMidiEvent*> ret;
-	foreach (QMidiEvent* e, fEvents) {
+	for (QMidiEvent* e : fEvents) {
 		if (e->voice() == voice) {
 			ret.append(e);
 		}
@@ -456,7 +456,7 @@ float QMidiFile::timeFromTick(qint32 tick)
 		qint32 tempo_event_tick = 0;
 		float tempo = 120.0;
 
-		foreach (QMidiEvent* e, fTempoEvents) {
+		for (QMidiEvent* e : fTempoEvents) {
 			if (e->tick() >= tick) {
 				break;
 			}
@@ -491,7 +491,7 @@ qint32 QMidiFile::tickFromTime(float time)
 		qint32 tempo_event_tick = 0;
 		float tempo = 120.0;
 
-		foreach (QMidiEvent* e, fTempoEvents) {
+		for (QMidiEvent* e : fTempoEvents) {
 			float next_tempo_event_time =
 				tempo_event_time +
 				(((float)(e->tick() - tempo_event_tick)) / fResolution / (tempo / 60));
@@ -855,7 +855,6 @@ bool QMidiFile::load(QString filename)
 bool QMidiFile::save(QString filename)
 {
 	QFile out(filename);
-	int curTrack;
 
 	if (out.exists()) {
 		out.remove();
@@ -879,8 +878,7 @@ bool QMidiFile::save(QString filename)
 		break;
 	}
 
-	foreach (curTrack, fTracks) {
-		QMidiEvent* e;
+	for (int curTrack : fTracks) {
 		qint32 track_size_offset, track_start_offset, track_end_offset, tick, previous_tick;
 
 		out.write("MTrk", 4);
@@ -893,7 +891,7 @@ bool QMidiFile::save(QString filename)
 		previous_tick = 0;
 
 		QList<QMidiEvent*> eventsForTrk = eventsForTrack(curTrack);
-		foreach (e, eventsForTrk) {
+		for (QMidiEvent* e : eventsForTrk) {
 			tick = e->tick();
 			write_variable_length_quantity(&out, tick - previous_tick);
 
