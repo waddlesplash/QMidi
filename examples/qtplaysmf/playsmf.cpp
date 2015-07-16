@@ -61,14 +61,14 @@ private slots:
 static void usage(char* program_name)
 {
 	fprintf(stderr, "Usage: %s -p<port> <MidiFile>\n\n", program_name);
-	fprintf(stderr, "Ports:\nID	Name\n----------------\n");
+	fputs("Ports:\nID\tName\n----------------\n", stderr);
 	QMap<QString, QString> vals = QMidiOut::devices();
 	foreach (QString key, vals.keys()) {
 		QString value = vals.value(key);
-		fprintf(stderr, key.toUtf8().constData());
-		fprintf(stderr, "	");
-		fprintf(stderr, value.toUtf8().constData());
-		fprintf(stderr, "\n");
+		fputs(key.toUtf8().constData(), stderr);
+		fputs("\t", stderr);
+		fputs(value.toUtf8().constData(), stderr);
+		fputs("\n", stderr);
 	}
 	exit(1);
 }
