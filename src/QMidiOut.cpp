@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2015 Augustin Cavalier <waddlesplash>
+ * Copyright 2012-2016 Augustin Cavalier <waddlesplash>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #include "QMidiOut.h"
@@ -8,10 +8,9 @@
 
 // TODO: error reporting
 
-QMidiOut::QMidiOut(QObject* parent)
-	: QObject(parent)
+QMidiOut::QMidiOut()
+	: fConnected(false)
 {
-	fConnected = false;
 }
 
 void QMidiOut::sendEvent(QMidiEvent& e)
@@ -21,7 +20,7 @@ void QMidiOut::sendEvent(QMidiEvent& e)
 
 void QMidiOut::setInstrument(int voice, int instr)
 {
-	qint32 msg = 0x0000C0 + voice;
+	qint32 msg = 0xC0 + voice;
 	msg |= instr << 8;
 	sendMsg(msg);
 }
@@ -52,16 +51,15 @@ void QMidiOut::pitchWheel(int voice, int value)
 void QMidiOut::controlChange(int voice, int number, int value)
 {
 	qint32 msg = 0xB0 + voice;
-	msg |= (number) << 8;
-	msg |= (value) << 16;
+	msg |= number << 8;
+	msg |= value << 16;
 	sendMsg(msg);
 }
 
 void QMidiOut::stopAll()
 {
-	for (int i = 0; i < 16; i++) {
+	for (int i = 0; i < 16; i++)
 		stopAll(i);
-	}
 }
 
 void QMidiOut::stopAll(int voice)

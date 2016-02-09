@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2015 Augustin Cavalier <waddlesplash>
+ * Copyright 2012-2016 Augustin Cavalier <waddlesplash>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #include "QMidiOut.h"
@@ -7,6 +7,7 @@
 #include <MidiRoster.h>
 #include <MidiConsumer.h>
 #include <MidiProducer.h>
+
 struct NativeMidiInstances {
 	BMidiConsumer* midiOutConsumer;
 	BMidiLocalProducer* midiOutLocProd;
@@ -22,7 +23,7 @@ QMap<QString, QString> QMidiOut::devices()
 	int32 id = 0;
 	while (OK) {
 		BMidiConsumer* c = BMidiRoster::NextConsumer(&id);
-		if (c != NULL) {
+		if (c != nullptr) {
 			ret.insert(QString::number(id), QString::fromUtf8(c->Name()));
 			c->Release();
 		} else {
@@ -40,7 +41,7 @@ bool QMidiOut::connect(QString outDeviceId)
 	fMidiPtrs = new NativeMidiInstances;
 
 	fMidiPtrs->midiOutConsumer = BMidiRoster::FindConsumer(outDeviceId.toInt());
-	if (fMidiPtrs->midiOutConsumer == NULL) {
+	if (fMidiPtrs->midiOutConsumer == nullptr) {
 		return false;
 	}
 	fMidiPtrs->midiOutLocProd = new BMidiLocalProducer("QMidi");
@@ -60,25 +61,23 @@ bool QMidiOut::connect(QString outDeviceId)
 
 void QMidiOut::disconnect()
 {
-	if (!fConnected) {
+	if (!fConnected)
 		return;
-	}
 
 	fMidiPtrs->midiOutLocProd->Disconnect(fMidiPtrs->midiOutConsumer);
 	fMidiPtrs->midiOutConsumer->Release();
 	fMidiPtrs->midiOutLocProd->Unregister();
 	fMidiPtrs->midiOutLocProd->Release();
+	fConnected = false;
 
 	delete fMidiPtrs;
-	fMidiPtrs = NULL;
-	fConnected = false;
+	fMidiPtrs = nullptr;
 }
 
 void QMidiOut::sendMsg(qint32 msg)
 {
-	if (!fConnected) {
+	if (!fConnected)
 		return;
-	}
 
 	char buf[3];
 	buf[0] = msg & 0xFF;

@@ -1,17 +1,17 @@
 /*
- * Copyright 2012-2015 Augustin Cavalier <waddlesplash>
+ * Copyright 2012-2016 Augustin Cavalier <waddlesplash>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #include "QMidiOut.h"
 
-#include "QMidiFile.h"
-
 #include <QStringList>
 
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <mmsystem.h>
+
 struct NativeMidiInstances {
-	HMIDIOUT midiOutPtr;
+	HMIDIOUT midiOut;
 };
 
 // TODO: error reporting
@@ -21,15 +21,13 @@ QMap<QString, QString> QMidiOut::devices()
 	QMap<QString, QString> ret;
 
 	int numDevs = midiOutGetNumDevs();
-	if (numDevs == 0) {
+	if (numDevs == 0)
 		return ret;
-	}
 
 	for (int i = 0; i < numDevs; i++) {
-		MIDIOUTCAPS* devCaps = new MIDIOUTCAPS;
-		midiOutGetDevCaps(i, devCaps, sizeof(*devCaps));
-		ret.insert(QString::number(i), QString::fromWCharArray(devCaps->szPname));
-		delete devCaps;
+		MIDIOUTCAPSW devCaps;
+		midiOutGetDevCapsW(i, &devCaps, sizeof(MIDIOUTCAPSW));
+		ret.insert(QString::number(i), QString::fromWCharArray(devCaps.szPname));
 	}
 
 	return ret;
@@ -41,7 +39,7 @@ bool QMidiOut::connect(QString outDeviceId)
 		disconnect();
 	fMidiPtrs = new NativeMidiInstances;
 
-	midiOutOpen(&fMidiPtrs->midiOutPtr, outDeviceId.toInt(), 0, 0, CALLBACK_NULL);
+	midiOutOpen(&fMidiPtrs->midiOut, outDeviceId.toInt(), 0, 0, CALLBACK_NULL);
 
 	fDeviceId = outDeviceId;
 	fConnected = true;
@@ -50,22 +48,20 @@ bool QMidiOut::connect(QString outDeviceId)
 
 void QMidiOut::disconnect()
 {
-	if (!fConnected) {
+	if (!fConnected)
 		return;
-	}
 
-	midiOutClose(fMidiPtrs->midiOutPtr);
+	midiOutClose(fMidiPtrs->midiOut);
+	fConnected = false;
 
 	delete fMidiPtrs;
-	fMidiPtrs = NULL;
-	fConnected = false;
+	fMidiPtrs = nullptr;
 }
 
 void QMidiOut::sendMsg(qint32 msg)
 {
-	if (!fConnected) {
+	if (!fConnected)
 		return;
-	}
 
-	midiOutShortMsg(fMidiPtrs->midiOutPtr, (DWORD)msg);
+	midiOutShortMsg(fMidiPtrs->midiOut, (DWORD)msg);
 }

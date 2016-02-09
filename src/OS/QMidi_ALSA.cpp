@@ -1,14 +1,14 @@
 /*
- * Copyright 2012-2015 Augustin Cavalier <waddlesplash>
+ * Copyright 2012-2016 Augustin Cavalier <waddlesplash>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #include "QMidiOut.h"
 
 #include <QStringList>
-
 #include <alsa/asoundlib.h>
 #include <alsa/seq.h>
 #include <alsa/seq_midi_event.h>
+
 struct NativeMidiInstances {
 	snd_seq_t* midiOutPtr;
 };
@@ -61,13 +61,12 @@ bool QMidiOut::connect(QString outDeviceId)
 	fMidiPtrs = new NativeMidiInstances;
 
 	int err = snd_seq_open(&fMidiPtrs->midiOutPtr, "default", SND_SEQ_OPEN_OUTPUT, 0);
-	if (err < 0) {
+	if (err < 0)
 		return false;
-	}
-	snd_seq_set_client_name(fMidiPtrs->midiOutPtr, "QtMidi");
+	snd_seq_set_client_name(fMidiPtrs->midiOutPtr, "QMidi");
 
 	snd_seq_create_simple_port(fMidiPtrs->midiOutPtr, "Output Port", SND_SEQ_PORT_CAP_READ,
-							   SND_SEQ_PORT_TYPE_MIDI_GENERIC);
+		SND_SEQ_PORT_TYPE_MIDI_GENERIC);
 
 	QStringList l = outDeviceId.split(":");
 	int client = l.at(0).toInt();
@@ -81,26 +80,24 @@ bool QMidiOut::connect(QString outDeviceId)
 
 void QMidiOut::disconnect()
 {
-	if (!fConnected) {
+	if (!fConnected)
 		return;
-	}
 
 	QStringList l = fDeviceId.split(":");
 	int client = l.at(0).toInt();
 	int port = l.at(1).toInt();
 
 	snd_seq_disconnect_from(fMidiPtrs->midiOutPtr, 0, client, port);
+	fConnected = false;
 
 	delete fMidiPtrs;
-	fMidiPtrs = NULL;
-	fConnected = false;
+	fMidiPtrs = nullptr;
 }
 
 void QMidiOut::sendMsg(qint32 msg)
 {
-	if (!fConnected) {
+	if (!fConnected)
 		return;
-	}
 
 	char buf[3];
 	buf[0] = msg & 0xFF;
