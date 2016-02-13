@@ -23,7 +23,7 @@ QMap<QString, QString> QMidiOut::devices()
 	int32 id = 0;
 	while (OK) {
 		BMidiConsumer* c = BMidiRoster::NextConsumer(&id);
-		if (c != nullptr) {
+		if (c != NULL) {
 			ret.insert(QString::number(id), QString::fromUtf8(c->Name()));
 			c->Release();
 		} else {
@@ -41,7 +41,7 @@ bool QMidiOut::connect(QString outDeviceId)
 	fMidiPtrs = new NativeMidiInstances;
 
 	fMidiPtrs->midiOutConsumer = BMidiRoster::FindConsumer(outDeviceId.toInt());
-	if (fMidiPtrs->midiOutConsumer == nullptr) {
+	if (fMidiPtrs->midiOutConsumer == NULL) {
 		return false;
 	}
 	fMidiPtrs->midiOutLocProd = new BMidiLocalProducer("QMidi");
@@ -71,7 +71,7 @@ void QMidiOut::disconnect()
 	fConnected = false;
 
 	delete fMidiPtrs;
-	fMidiPtrs = nullptr;
+	fMidiPtrs = NULL;
 }
 
 void QMidiOut::sendMsg(qint32 msg)

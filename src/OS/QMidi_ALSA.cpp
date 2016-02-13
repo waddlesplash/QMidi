@@ -91,7 +91,7 @@ void QMidiOut::disconnect()
 	fConnected = false;
 
 	delete fMidiPtrs;
-	fMidiPtrs = nullptr;
+	fMidiPtrs = NULL;
 }
 
 void QMidiOut::sendMsg(qint32 msg)
