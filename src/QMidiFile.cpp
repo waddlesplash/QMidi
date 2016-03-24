@@ -235,7 +235,7 @@ void QMidiFile::addEvent(qint32 tick, QMidiEvent* e)
 {
 	e->setTick(tick);
 	fEvents.append(e);
-	if ((e->track() == 0) && (e->number() == QMidiEvent::Tempo)) {
+	if ((e->track() == 0) && (e->type() == QMidiEvent::Meta) && (e->number() == QMidiEvent::Tempo)) {
 		fTempoEvents.append(e);
 	}
 	sort();
@@ -243,7 +243,7 @@ void QMidiFile::addEvent(qint32 tick, QMidiEvent* e)
 void QMidiFile::removeEvent(QMidiEvent* e)
 {
 	fEvents.removeOne(e);
-	if ((e->track() == 0) && (e->number() == QMidiEvent::Tempo)) {
+	if ((e->track() == 0) && (e->type() == QMidiEvent::Meta) && (e->number() == QMidiEvent::Tempo)) {
 		fTempoEvents.removeOne(e);
 	}
 }
