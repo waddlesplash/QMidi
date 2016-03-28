@@ -838,6 +838,10 @@ bool QMidiFile::load(QString filename)
 			}
 
 			number_of_tracks_read++;
+		} else {
+			in.close();
+            		disableSort = false;
+            		return false;
 		}
 
 		/* forwards compatibility: skip over any unrecognized chunks, or extra
