@@ -841,6 +841,7 @@ bool QMidiFile::load(QString filename)
 		} else {
 			in.close();
             		disableSort = false;
+            		sort();
             		return false;
 		}
 
