@@ -114,6 +114,7 @@ public:
 	QMidiFile();
 	~QMidiFile();
 
+	void clear();
 	bool load(QString filename);
 	bool save(QString filename);
 

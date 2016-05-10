@@ -173,9 +173,7 @@ QMidiFile::QMidiFile()
 
 QMidiFile::~QMidiFile()
 {
-	for (QMidiEvent* e : fEvents) {
-		delete e;
-	}
+	clear();
 }
 
 bool isGreaterThan(QMidiEvent* e1, QMidiEvent* e2)
@@ -624,8 +622,17 @@ void write_variable_length_quantity(QFile* out, quint32 value)
 	out->write((char*)buffer + offset, 4 - offset);
 }
 
+void QMidiFile::clear()
+{
+	for (QMidiEvent* e : fEvents) {
+		delete e;
+	}
+}
+
 bool QMidiFile::load(QString filename)
 {
+	clear();
+
 	QFile in(filename);
 
 	if (!in.exists() || !in.open(QFile::ReadOnly)) {
