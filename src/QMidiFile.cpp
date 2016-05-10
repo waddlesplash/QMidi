@@ -634,7 +634,6 @@ bool QMidiFile::load(QString filename)
 	clear();
 
 	QFile in(filename);
-
 	if (!in.exists() || !in.open(QFile::ReadOnly)) {
 		return false;
 	}
@@ -847,9 +846,8 @@ bool QMidiFile::load(QString filename)
 			number_of_tracks_read++;
 		} else {
 			in.close();
-            		disableSort = false;
-            		sort();
-            		return false;
+			clear();
+			return false;
 		}
 
 		/* forwards compatibility: skip over any unrecognized chunks, or extra
