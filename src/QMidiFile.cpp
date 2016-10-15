@@ -600,7 +600,7 @@ quint32 read_variable_length_quantity(QFile* in)
 	do {
 		in->getChar((char*)&b);
 		value = (value << 7) | (b & 0x7F);
-	} while ((b & 0x80) == 0x80);
+	} while ((b & 0x80) == 0x80 && !in->atEnd());
 
 	return value;
 }
@@ -730,7 +730,7 @@ bool QMidiFile::load(QString filename)
 			unsigned char status, running_status = 0;
 			int at_end_of_track = 0;
 
-			while ((in.pos() < chunk_start + chunk_size) && !at_end_of_track) {
+			while ((in.pos() < chunk_start + chunk_size) && !at_end_of_track && !in.atEnd()) {
 				tick = read_variable_length_quantity(&in) + previous_tick;
 				previous_tick = tick;
 
@@ -854,6 +854,7 @@ bool QMidiFile::load(QString filename)
 		 * data at the end of tracks. */
 		in.seek(chunk_start + chunk_size);
 	}
+	// TODO: Report if the file had errors.
 
 	in.close();
 	disableSort = false;
