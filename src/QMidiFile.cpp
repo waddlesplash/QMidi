@@ -727,10 +727,11 @@ bool QMidiFile::load(QString filename)
 		if (memcmp(chunk_id, "MTrk", 4) == 0) {
 			int track = createTrack();
 			qint32 tick = 0, previous_tick = 0;
+			qint64 previous_pos = 0;
 			unsigned char status, running_status = 0;
 			int at_end_of_track = 0;
 
-			while ((in.pos() < chunk_start + chunk_size) && !at_end_of_track && !in.atEnd()) {
+			while ((in.pos() < chunk_start + chunk_size) && !at_end_of_track) {
 				tick = read_variable_length_quantity(&in) + previous_tick;
 				previous_tick = tick;
 
@@ -742,6 +743,14 @@ bool QMidiFile::load(QString filename)
 				} else {
 					running_status = status;
 				}
+
+				if (in.pos() == previous_pos) {
+					in.close();
+					disableSort = false;
+					sort();
+					return false;
+				}
+				previous_pos = in.pos();
 
 				switch (status & 0xF0) {
 				case 0x80: {
@@ -846,7 +855,8 @@ bool QMidiFile::load(QString filename)
 			number_of_tracks_read++;
 		} else {
 			in.close();
-			clear();
+			disableSort = false;
+			sort();
 			return false;
 		}
 
@@ -854,7 +864,6 @@ bool QMidiFile::load(QString filename)
 		 * data at the end of tracks. */
 		in.seek(chunk_start + chunk_size);
 	}
-	// TODO: Report if the file had errors.
 
 	in.close();
 	disableSort = false;
