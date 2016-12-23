@@ -125,9 +125,6 @@ public:
 	inline void setFileFormat(int fileFormat) { fFileFormat = fileFormat; }
 	inline int fileFormat() { return fFileFormat; }
 
-	inline bool sortDisabled() { return disableSort; }
-	inline void setSortDisabled(bool disabled) { disableSort = disabled; }
-
 	inline void setResolution(int resolution) { fResolution = resolution; }
 	inline int resolution() { return fResolution; }
 
@@ -179,5 +176,6 @@ private:
 	DivisionType fDivType;
 	int fResolution;
 	int fFileFormat;
-	bool disableSort;
+
+	bool fDisableSort;
 };

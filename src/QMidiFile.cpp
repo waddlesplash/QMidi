@@ -164,23 +164,25 @@ float QMidiEvent::tempo()
 /* End of QMidiEvent functions, on to QMidiFile */
 
 QMidiFile::QMidiFile()
+	: fDisableSort(false)
 {
-	fDivType = PPQ;
-	fFileFormat = 1;
-	fResolution = 0;
-	disableSort = false;
+	clear();
 }
-
 QMidiFile::~QMidiFile()
 {
 	clear();
 }
 
-bool isGreaterThan(QMidiEvent* e1, QMidiEvent* e2)
+void QMidiFile::clear()
 {
-	qint32 e1t = e1->tick();
-	qint32 e2t = e2->tick();
-	return (e1t < e2t);
+	for (QMidiEvent* e : fEvents)
+		delete e;
+	fEvents.clear();
+	fTempoEvents.clear();
+	fTracks.clear();
+	fDivType = PPQ;
+	fResolution = 0;
+	fFileFormat = 1;
 }
 
 QMidiFile* QMidiFile::oneTrackPerVoice()
@@ -196,7 +198,7 @@ QMidiFile* QMidiFile::oneTrackPerVoice()
 
 	QMap<int /*voice*/, int /*track*/> tracks;
 	ret->createTrack(); /* Track 0 */
-	ret->setSortDisabled(true);
+	ret->fDisableSort = true;
 	for (QMidiEvent* event : fEvents) {
 		QMidiEvent* e = new QMidiEvent();
 		*e = *event; /* copy data buffer */
@@ -215,14 +217,20 @@ QMidiFile* QMidiFile::oneTrackPerVoice()
 		e->setTrack(tracks.value(e->voice()));
 		ret->addEvent(e->tick(), e);
 	}
-	ret->setSortDisabled(false);
+	ret->fDisableSort = false;
 	ret->sort();
 	return ret;
 }
 
+bool isGreaterThan(QMidiEvent* e1, QMidiEvent* e2)
+{
+	qint32 e1t = e1->tick();
+	qint32 e2t = e2->tick();
+	return (e1t < e2t);
+}
 void QMidiFile::sort()
 {
-	if (disableSort) {
+	if (fDisableSort) {
 		return;
 	}
 	qStableSort(fEvents.begin(), fEvents.end(), isGreaterThan);
@@ -622,13 +630,6 @@ void write_variable_length_quantity(QFile* out, quint32 value)
 	out->write((char*)buffer + offset, 4 - offset);
 }
 
-void QMidiFile::clear()
-{
-	for (QMidiEvent* e : fEvents) {
-		delete e;
-	}
-}
-
 bool QMidiFile::load(QString filename)
 {
 	clear();
@@ -638,7 +639,7 @@ bool QMidiFile::load(QString filename)
 		return false;
 	}
 
-	disableSort = true;
+	fDisableSort = true;
 	unsigned char chunk_id[4], division_type_and_resolution[4];
 	qint32 chunk_size = 0, chunk_start = 0;
 	int file_format = 0, number_of_tracks = 0, number_of_tracks_read = 0;
@@ -655,7 +656,7 @@ bool QMidiFile::load(QString filename)
 
 		if (memcmp(chunk_id, "RMID", 4) != 0) {
 			in.close();
-			disableSort = false;
+			fDisableSort = false;
 			return false;
 		}
 
@@ -664,7 +665,7 @@ bool QMidiFile::load(QString filename)
 
 		if (memcmp(chunk_id, "data", 4) != 0) {
 			in.close();
-			disableSort = false;
+			fDisableSort = false;
 			return false;
 		}
 
@@ -675,7 +676,7 @@ bool QMidiFile::load(QString filename)
 
 	if (memcmp(chunk_id, "MThd", 4) != 0) {
 		in.close();
-		disableSort = false;
+		fDisableSort = false;
 		return false;
 	}
 
@@ -746,7 +747,7 @@ bool QMidiFile::load(QString filename)
 
 				if (in.pos() == previous_pos) {
 					in.close();
-					disableSort = false;
+					fDisableSort = false;
 					sort();
 					return false;
 				}
@@ -855,7 +856,7 @@ bool QMidiFile::load(QString filename)
 			number_of_tracks_read++;
 		} else {
 			in.close();
-			disableSort = false;
+			fDisableSort = false;
 			sort();
 			return false;
 		}
@@ -866,7 +867,7 @@ bool QMidiFile::load(QString filename)
 	}
 
 	in.close();
-	disableSort = false;
+	fDisableSort = false;
 	sort();
 	return true;
 }
