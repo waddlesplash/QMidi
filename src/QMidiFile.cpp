@@ -6,7 +6,7 @@
 #include "QMidiFile.h"
 
 #include <QFile>
-#include <stdlib.h>
+#include <cstdlib>
 
 QMidiEvent::QMidiEvent()
 {
