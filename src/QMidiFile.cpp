@@ -23,8 +23,11 @@ QMidiEvent::QMidiEvent()
 	fData = "";
 	fTick = -1;
 }
+QMidiEvent::~QMidiEvent()
+{
+}
 
-quint32 QMidiEvent::message()
+quint32 QMidiEvent::message() const
 {
 	union {
 		unsigned char data_as_bytes[4];

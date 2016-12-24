@@ -35,6 +35,7 @@ public:
 	};
 
 	QMidiEvent();
+	~QMidiEvent();
 
 	inline EventType type() { return fType; }
 	inline void setType(EventType newType) { fType = newType; }
@@ -76,7 +77,7 @@ public:
 	inline QByteArray data() { return fData; }
 	inline void setData(QByteArray data) { fData = data; }
 
-	quint32 message();
+	quint32 message() const;
 	void setMessage(quint32 data);
 
 	inline bool isNoteEvent() { return ((fType == NoteOn) || (fType == NoteOff)); }
@@ -85,10 +86,10 @@ private:
 	int fVoice;
 	int fNote;
 	int fVelocity;
-	int fAmount;	  // KeyPressure, ChannelPressure
-	int fNumber;	  // ControlChange, ProgramChange, Meta
-	int fValue;	   // PitchWheel, ControlChange
-	int fNumerator;   // TimeSignature
+	int fAmount;	// KeyPressure, ChannelPressure
+	int fNumber;	// ControlChange, ProgramChange, Meta
+	int fValue;		// PitchWheel, ControlChange
+	int fNumerator; // TimeSignature
 	int fDenominator; // TimeSignature
 	QByteArray fData; // Meta, SysEx
 

@@ -19,7 +19,7 @@ QMidiOut::~QMidiOut()
 		disconnect();
 }
 
-void QMidiOut::sendEvent(QMidiEvent& e)
+void QMidiOut::sendEvent(const QMidiEvent& e)
 {
 	sendMsg(e.message());
 }
