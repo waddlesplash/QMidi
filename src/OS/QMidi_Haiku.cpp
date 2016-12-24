@@ -8,7 +8,7 @@
 #include <MidiConsumer.h>
 #include <MidiProducer.h>
 
-struct NativeMidiInstances {
+struct NativeMidiOutInstances {
 	BMidiConsumer* midiOutConsumer;
 	BMidiLocalProducer* midiOutLocProd;
 };
@@ -38,7 +38,7 @@ bool QMidiOut::connect(QString outDeviceId)
 {
 	if (fConnected)
 		disconnect();
-	fMidiPtrs = new NativeMidiInstances;
+	fMidiPtrs = new NativeMidiOutInstances;
 
 	fMidiPtrs->midiOutConsumer = BMidiRoster::FindConsumer(outDeviceId.toInt());
 	if (fMidiPtrs->midiOutConsumer == NULL) {

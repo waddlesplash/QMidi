@@ -10,7 +10,7 @@
 #include <windows.h>
 #include <mmsystem.h>
 
-struct NativeMidiInstances {
+struct NativeMidiOutInstances {
 	HMIDIOUT midiOut;
 };
 
@@ -37,7 +37,7 @@ bool QMidiOut::connect(QString outDeviceId)
 {
 	if (fConnected)
 		disconnect();
-	fMidiPtrs = new NativeMidiInstances;
+	fMidiPtrs = new NativeMidiOutInstances;
 
 	midiOutOpen(&fMidiPtrs->midiOut, outDeviceId.toInt(), 0, 0, CALLBACK_NULL);
 

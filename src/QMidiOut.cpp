@@ -9,8 +9,14 @@
 // TODO: error reporting
 
 QMidiOut::QMidiOut()
-	: fConnected(false)
+	: fMidiPtrs(NULL),
+	  fConnected(false)
 {
+}
+QMidiOut::~QMidiOut()
+{
+	if (fConnected)
+		disconnect();
 }
 
 void QMidiOut::sendEvent(QMidiEvent& e)

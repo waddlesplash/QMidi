@@ -8,7 +8,7 @@
 #include <QString>
 
 class QMidiEvent;
-struct NativeMidiInstances;
+struct NativeMidiOutInstances;
 
 class QMidiOut
 {
@@ -16,6 +16,7 @@ public:
 	static QMap<QString /* key */, QString /* name */> devices();
 
 	QMidiOut();
+	~QMidiOut();
 	bool connect(QString outDeviceId);
 	void disconnect();
 	void sendMsg(qint32 msg);
@@ -31,6 +32,6 @@ public:
 
 private:
 	QString fDeviceId;
-	NativeMidiInstances* fMidiPtrs;
+	NativeMidiOutInstances* fMidiPtrs;
 	bool fConnected;
 };
