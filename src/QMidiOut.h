@@ -26,6 +26,8 @@ public:
 	void noteOn(int note, int voice, int velocity = 64);
 	void noteOff(int note, int voice);
 	void pitchWheel(int voice, int value);
+	void channelAftertouch(int voice, int value);
+	void polyphonicAftertouch(int note, int voice, int value);
 	void controlChange(int voice, int number, int value);
 	void stopAll();
 	void stopAll(int voice);

@@ -54,6 +54,21 @@ void QMidiOut::pitchWheel(int voice, int value)
 	sendMsg(msg);
 }
 
+void QMidiOut::channelAftertouch(int voice, int value)
+{
+	qint32 msg = 0xD0 + voice;
+	msg |= value << 8;
+	sendMsg(msg);
+}
+
+void QMidiOut::polyphonicAftertouch(int note, int voice, int value)
+{
+	qint32 msg = 0xA0 + voice;
+	msg |= note << 8;
+	msg |= value << 16;
+	sendMsg(msg);
+}
+
 void QMidiOut::controlChange(int voice, int number, int value)
 {
 	qint32 msg = 0xB0 + voice;
