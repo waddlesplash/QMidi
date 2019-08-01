@@ -32,6 +32,9 @@ public:
 	void stopAll();
 	void stopAll(int voice);
 
+    bool isConnected() const { return fConnected; }
+    QString deviceId() const { return fDeviceId; }
+
 private:
 	QString fDeviceId;
 	NativeMidiOutInstances* fMidiPtrs;
