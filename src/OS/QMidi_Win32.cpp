@@ -3,12 +3,15 @@
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #include "QMidiOut.h"
+#include "QMidiFile.h"
 
 #include <QStringList>
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <mmsystem.h>
+
+/* -----------------------------[ QMidiOut ]------------------------------ */
 
 struct NativeMidiOutInstances {
 	HMIDIOUT midiOut;
@@ -64,4 +67,109 @@ void QMidiOut::sendMsg(qint32 msg)
 		return;
 
 	midiOutShortMsg(fMidiPtrs->midiOut, (DWORD)msg);
+}
+
+/* ------------------------------[ QMidiIn ]------------------------------ */
+
+#include "QMidiIn.h"
+
+struct NativeMidiInInstances {
+    HMIDIIN midiIn;
+};
+
+QMap<QString, QString> QMidiIn::devices()
+{
+    QMap<QString, QString> ret;
+
+    unsigned int numDevs = midiInGetNumDevs();
+    if (numDevs == 0)
+    {
+        return ret;
+    }
+
+    for (unsigned int i = 0; i < numDevs; i++)
+    {
+        MIDIINCAPSW devCaps;
+        midiInGetDevCapsW(i, &devCaps, sizeof(MIDIINCAPSW));
+        ret.insert(QString::number(i), QString::fromWCharArray(devCaps.szPname));
+    }
+
+    return ret;
+}
+
+#include <QDebug>
+
+static void CALLBACK QMidiInProc(HMIDIIN /* hMidiIn */, UINT wMsg, DWORD_PTR dwInstance, DWORD_PTR dwParam1, DWORD_PTR dwParam2)
+{
+    QMidiIn* self = reinterpret_cast<QMidiIn*>(dwInstance);
+    switch (wMsg)
+    {
+    case MIM_OPEN:
+    case MIM_CLOSE:
+        break;
+    case MIM_DATA:
+        emit(self->midiEvent(static_cast<quint32>(dwParam1), static_cast<quint32>(dwParam2)));
+        break;
+    case MIM_LONGDATA:
+    {
+        auto midiHeader = reinterpret_cast<MIDIHDR*>(dwParam1);
+        auto rawData = QByteArray(midiHeader->lpData, static_cast<int>(midiHeader->dwBytesRecorded));
+        qDebug() << rawData;
+        break;
+    }
+    default:
+        qDebug() << "no handler for message" << wMsg;
+    }
+}
+
+bool QMidiIn::connect(QString inDeviceId)
+{
+    if (fConnected)
+    {
+        disconnect();
+    }
+    fMidiPtrs = new NativeMidiInInstances;
+
+    fDeviceId = inDeviceId;
+    midiInOpen(&fMidiPtrs->midiIn,
+               inDeviceId.toInt(),
+               reinterpret_cast<DWORD_PTR>(&QMidiInProc),
+               reinterpret_cast<DWORD_PTR>(this),
+               CALLBACK_FUNCTION); // | MIDI_IO_STATUS);
+
+    fConnected = true;
+    return true;
+}
+
+void QMidiIn::disconnect()
+{
+    if (!fConnected)
+    {
+        return;
+    }
+
+    midiInClose(fMidiPtrs->midiIn);
+    fConnected = false;
+    delete fMidiPtrs;
+    fMidiPtrs = nullptr;
+}
+
+void QMidiIn::start()
+{
+    if (!fConnected)
+    {
+        return;
+    }
+
+    midiInStart(fMidiPtrs->midiIn);
+}
+
+void QMidiIn::stop()
+{
+    if (!fConnected)
+    {
+        return;
+    }
+
+    midiInStop(fMidiPtrs->midiIn);
 }

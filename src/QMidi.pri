@@ -3,10 +3,12 @@ CONFIG += c++11
 
 INCLUDEPATH += $$PWD
 SOURCES += $$PWD/QMidiOut.cpp \
-	$$PWD/QMidiFile.cpp
+	$$PWD/QMidiFile.cpp \
+	$$PWD/QMidiIn.cpp
 
 HEADERS += $$PWD/QMidiOut.h \
-	$$PWD/QMidiFile.h
+	$$PWD/QMidiFile.h \
+	$$PWD/QMidiIn.h
 
 win32 {
 	LIBS += -lwinmm
