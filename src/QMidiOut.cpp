@@ -21,6 +21,12 @@ QMidiOut::~QMidiOut()
 
 void QMidiOut::sendEvent(const QMidiEvent& e)
 {
+	if (e.type() == QMidiEvent::SysEx)
+	{
+		sendSysEx(e.data());
+		return;
+	}
+
 	sendMsg(e.message());
 }
 

@@ -20,6 +20,11 @@ public:
 	bool connect(QString outDeviceId);
 	void disconnect();
 	void sendMsg(qint32 msg);
+	//!
+	//! \brief sendSysex Sends a raw MIDI System Exclusive (SysEx) message.
+	//! \param data The data to send.
+	//!
+	void sendSysEx(const QByteArray &data);
 
 	void sendEvent(const QMidiEvent& e);
 	void setInstrument(int voice, int instr);

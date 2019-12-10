@@ -69,6 +69,27 @@ void QMidiOut::sendMsg(qint32 msg)
 	midiOutShortMsg(fMidiPtrs->midiOut, (DWORD)msg);
 }
 
+void QMidiOut::sendSysEx(const QByteArray &data)
+{
+    if (!fConnected)
+    {
+        return;
+    }
+
+    MIDIHDR header;
+    memset(&header, 0, sizeof(MIDIHDR));
+
+    header.lpData = (LPSTR) data.data();
+    header.dwBufferLength = data.length();
+
+    // TODO: check for retval of midiOutPrepareHeader
+    midiOutPrepareHeader(fMidiPtrs->midiOut, &header, sizeof(MIDIHDR));
+
+    midiOutLongMsg(fMidiPtrs->midiOut, &header, sizeof(MIDIHDR));
+
+    while (midiOutUnprepareHeader(fMidiPtrs->midiOut, &header, sizeof(MIDIHDR)) == MIDIERR_STILLPLAYING);
+}
+
 /* ------------------------------[ QMidiIn ]------------------------------ */
 
 #include "QMidiIn.h"
