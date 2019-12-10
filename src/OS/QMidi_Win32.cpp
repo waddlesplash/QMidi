@@ -95,7 +95,15 @@ void QMidiOut::sendSysEx(const QByteArray &data)
 #include "QMidiIn.h"
 
 struct NativeMidiInInstances {
+    //!
+    //! \brief midiIn is a reference to the MIDI input device
+    //!
     HMIDIIN midiIn;
+    //!
+    //! \brief header is a prepared MIDI header, used for receiving
+    //! MIM_LONGDATA (System Exclusive) messages.
+    //!
+    MIDIHDR header;
 };
 
 QMap<QString, QString> QMidiIn::devices()
@@ -118,9 +126,7 @@ QMap<QString, QString> QMidiIn::devices()
     return ret;
 }
 
-#include <QDebug>
-
-static void CALLBACK QMidiInProc(HMIDIIN /* hMidiIn */, UINT wMsg, DWORD_PTR dwInstance, DWORD_PTR dwParam1, DWORD_PTR dwParam2)
+static void CALLBACK QMidiInProc(HMIDIIN hMidiIn, UINT wMsg, DWORD_PTR dwInstance, DWORD_PTR dwParam1, DWORD_PTR dwParam2)
 {
     QMidiIn* self = reinterpret_cast<QMidiIn*>(dwInstance);
     switch (wMsg)
@@ -135,11 +141,16 @@ static void CALLBACK QMidiInProc(HMIDIIN /* hMidiIn */, UINT wMsg, DWORD_PTR dwI
     {
         auto midiHeader = reinterpret_cast<MIDIHDR*>(dwParam1);
         auto rawData = QByteArray(midiHeader->lpData, static_cast<int>(midiHeader->dwBytesRecorded));
-        qDebug() << rawData;
+        emit(self->midiSysExEvent(rawData));
+
+        // Prepare the midi header to be reused -- what's the worst that could happen?
+        midiInUnprepareHeader(hMidiIn, midiHeader, sizeof(MIDIHDR));
+        midiInPrepareHeader(hMidiIn, midiHeader, sizeof(MIDIHDR));
+        midiInAddBuffer(hMidiIn, midiHeader, sizeof(MIDIHDR));
         break;
     }
     default:
-        qDebug() << "no handler for message" << wMsg;
+        qWarning("QMidi_Win32: no handler for message %d", wMsg);
     }
 }
 
@@ -156,7 +167,13 @@ bool QMidiIn::connect(QString inDeviceId)
                inDeviceId.toInt(),
                reinterpret_cast<DWORD_PTR>(&QMidiInProc),
                reinterpret_cast<DWORD_PTR>(this),
-               CALLBACK_FUNCTION); // | MIDI_IO_STATUS);
+               CALLBACK_FUNCTION | MIDI_IO_STATUS);
+
+    memset(&fMidiPtrs->header, 0, sizeof(MIDIHDR));
+    fMidiPtrs->header.lpData = new char[512];  // 512 bytes ought to be enough for everyone
+    fMidiPtrs->header.dwBufferLength = 512;
+    midiInPrepareHeader(fMidiPtrs->midiIn, &fMidiPtrs->header, sizeof(MIDIHDR));
+    midiInAddBuffer(fMidiPtrs->midiIn, &fMidiPtrs->header, sizeof(MIDIHDR));
 
     fConnected = true;
     return true;
@@ -169,6 +186,7 @@ void QMidiIn::disconnect()
         return;
     }
 
+    delete fMidiPtrs->header.lpData;
     midiInClose(fMidiPtrs->midiIn);
     fConnected = false;
     delete fMidiPtrs;

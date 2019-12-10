@@ -40,6 +40,7 @@ public:
 
 signals:
     void midiEvent(quint32 message, quint32 timing);
+    void midiSysExEvent(QByteArray data);
 
 private:
     QString fDeviceId;
