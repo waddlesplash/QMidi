@@ -18,6 +18,7 @@ win32 {
 linux* {
 	LIBS += -lasound
 	SOURCES += $$PWD/OS/QMidi_ALSA.cpp
+	HEADERS += $$PWD/OS/QMidi_ALSA.h
 }
 
 haiku* {
