@@ -24,4 +24,5 @@ linux* {
 haiku* {
 	LIBS += -lmidi2
 	SOURCES += $$PWD/OS/QMidi_Haiku.cpp
+	HEADERS += $$PWD/OS/QMidi_Haiku.h
 }
