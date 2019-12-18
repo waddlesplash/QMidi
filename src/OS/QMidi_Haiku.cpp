@@ -79,10 +79,25 @@ void QMidiOut::sendMsg(qint32 msg)
 	if (!fConnected)
 		return;
 
+	size_t bufferLength = 3;
 	char buf[3];
 	buf[0] = msg & 0xFF;
 	buf[1] = (msg >> 8) & 0xFF;
 	buf[2] = (msg >> 16) & 0xFF;
 
-	fMidiPtrs->midiOutLocProd->SprayData((void*)&buf, 3, true);
+	if (buf[0] == '\xC0' || buf[0] == '\xD0')
+	{
+		// workaround for Haiku bug #15562
+		bufferLength = 2;
+	}
+
+	fMidiPtrs->midiOutLocProd->SprayData((void*)&buf, bufferLength, true);
+}
+
+void QMidiOut::sendSysEx(const QByteArray &data)
+{
+    if (!fConnected)
+        return;
+
+    fMidiPtrs->midiOutLocProd->SprayData((char*)data.data(), data.length(), false);
 }
