@@ -4,10 +4,12 @@ compiler: clang
 addons:
   apt:
     packages:
-    - libqt4-dev
+    - qt5-default
+    - qt5-qmake
     - libasound2-dev
 install:
  - cd examples/qtplaysmf/
 script:
- - qmake -spec unsupported/linux-clang .
+ - qmake --version
+ - qmake .
  - make
