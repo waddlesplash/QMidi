@@ -20,8 +20,15 @@ struct NativeMidiOutInstances {
 
 // TODO: error reporting
 
-QMap<QString, QString> QMidiOut::devices()
+static QMap<QString, QString> buildDevicesMap(bool forInput)
 {
+	int streams = SND_SEQ_OPEN_OUTPUT;
+	int cap = SND_SEQ_PORT_CAP_SUBS_READ | SND_SEQ_PORT_CAP_READ;
+	if (forInput) {
+		streams = SND_SEQ_OPEN_INPUT;
+		cap = SND_SEQ_PORT_CAP_SUBS_WRITE | SND_SEQ_PORT_CAP_WRITE;
+	}
+
 	QMap<QString, QString> ret;
 
 	snd_seq_client_info_t* cinfo;
@@ -30,7 +37,7 @@ QMap<QString, QString> QMidiOut::devices()
 	int err;
 	snd_seq_t* handle;
 
-	err = snd_seq_open(&handle, "hw", SND_SEQ_OPEN_OUTPUT, 0);
+	err = snd_seq_open(&handle, "hw", streams, 0);
 	if (err < 0) {
 		/* Use snd_strerror(errno) to get the error here. */
 		return ret;
@@ -46,7 +53,6 @@ QMap<QString, QString> QMidiOut::devices()
 
 		snd_seq_port_info_set_port(pinfo, -1);
 		while (snd_seq_query_next_port(handle, pinfo) >= 0) {
-			int cap = (SND_SEQ_PORT_CAP_SUBS_WRITE | SND_SEQ_PORT_CAP_WRITE);
 			if ((snd_seq_port_info_get_capability(pinfo) & cap) == cap) {
 				QString port = QString::number(snd_seq_port_info_get_client(pinfo));
 				port += ":" + QString::number(snd_seq_port_info_get_port(pinfo));
@@ -59,6 +65,11 @@ QMap<QString, QString> QMidiOut::devices()
 	snd_seq_close(handle);
 
 	return ret;
+}
+
+QMap<QString, QString> QMidiOut::devices()
+{
+	return buildDevicesMap(false);
 }
 
 bool QMidiOut::connect(QString outDeviceId)
@@ -166,43 +177,7 @@ struct NativeMidiInInstances {
 
 QMap<QString, QString> QMidiIn::devices()
 {
-	QMap<QString, QString> ret;
-
-	snd_seq_client_info_t* cinfo;
-	snd_seq_port_info_t* pinfo;
-	int client;
-	int err;
-	snd_seq_t* handle;
-
-	err = snd_seq_open(&handle, "hw", SND_SEQ_OPEN_INPUT, 0);
-	if (err < 0) {
-		/* Use snd_strerror(errno) to get the error here. */
-		return ret;
-	}
-
-	snd_seq_client_info_alloca(&cinfo);
-	snd_seq_client_info_set_client(cinfo, -1);
-
-	while (snd_seq_query_next_client(handle, cinfo) >= 0) {
-		client = snd_seq_client_info_get_client(cinfo);
-		snd_seq_port_info_alloca(&pinfo);
-		snd_seq_port_info_set_client(pinfo, client);
-
-		snd_seq_port_info_set_port(pinfo, -1);
-		while (snd_seq_query_next_port(handle, pinfo) >= 0) {
-			int cap = (SND_SEQ_PORT_CAP_SUBS_READ | SND_SEQ_PORT_CAP_READ);
-			if ((snd_seq_port_info_get_capability(pinfo) & cap) == cap) {
-				QString port = QString::number(snd_seq_port_info_get_client(pinfo));
-				port += ":" + QString::number(snd_seq_port_info_get_port(pinfo));
-				QString name = snd_seq_client_info_get_name(cinfo);
-				ret.insert(port, name);
-			}
-		}
-	}
-
-	snd_seq_close(handle);
-
-	return ret;
+	return buildDevicesMap(true);
 }
 
 bool QMidiIn::connect(QString inDeviceId)
