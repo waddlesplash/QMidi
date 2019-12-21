@@ -5,14 +5,14 @@
 #include "QMidiIn.h"
 
 QMidiIn::QMidiIn(QObject *parent)
-    : QObject(parent),
-      fMidiPtrs(nullptr),
-      fConnected(false)
+	: QObject(parent),
+	fMidiPtrs(nullptr),
+	fConnected(false)
 {
 }
 
 QMidiIn::~QMidiIn()
 {
-    if (fConnected)
-        disconnect();
+	if (fConnected)
+		disconnect();
 }

@@ -20,10 +20,8 @@ public:
 	bool connect(QString outDeviceId);
 	void disconnect();
 	void sendMsg(qint32 msg);
-	//!
 	//! \brief sendSysex Sends a raw MIDI System Exclusive (SysEx) message.
 	//! \param data The data to send.
-	//!
 	void sendSysEx(const QByteArray &data);
 
 	void sendEvent(const QMidiEvent& e);
@@ -37,8 +35,8 @@ public:
 	void stopAll();
 	void stopAll(int voice);
 
-    bool isConnected() const { return fConnected; }
-    QString deviceId() const { return fDeviceId; }
+	bool isConnected() const { return fConnected; }
+	QString deviceId() const { return fDeviceId; }
 
 private:
 	QString fDeviceId;

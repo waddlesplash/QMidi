@@ -9,22 +9,20 @@
 class QMidiIn;
 struct NativeMidiInInstances;
 
-//!
 //! \brief The MidiInReceiveThread class runs the ALSA MIDI input thread.  This
 //! is required since the function that reads input from a \c snd_seq_t handle
 //! blocks.
-//!
 class MidiInReceiveThread : public QThread
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    MidiInReceiveThread(QMidiIn* qMidiIn, NativeMidiInInstances* fMidiPtrs, QObject* parent = nullptr);
+	MidiInReceiveThread(QMidiIn* qMidiIn, NativeMidiInInstances* fMidiPtrs, QObject* parent = nullptr);
 
 private:
-    void run() override;
+	void run() override;
 
 private:
-    QMidiIn* fMidiIn;
-    NativeMidiInInstances* fMidiPtrs;
+	QMidiIn* fMidiIn;
+	NativeMidiInInstances* fMidiPtrs;
 };
