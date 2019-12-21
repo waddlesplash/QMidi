@@ -109,7 +109,7 @@ void QMidiOut::sendSysEx(const QByteArray &data)
 
 struct NativeMidiInInstances {
 	BMidiProducer* midiInProducer;
-	MidiInConsumer* midiInConsumer;
+	QMidiInternal::MidiInConsumer* midiInConsumer;
 };
 
 QMap<QString, QString> QMidiIn::devices()
@@ -142,7 +142,7 @@ bool QMidiIn::connect(QString inDeviceId)
 	if (fMidiPtrs->midiInProducer == NULL) {
 		return false;
 	}
-	fMidiPtrs->midiInConsumer = new MidiInConsumer(this, "QMidi");
+	fMidiPtrs->midiInConsumer = new QMidiInternal::MidiInConsumer(this, "QMidi");
 	if (!fMidiPtrs->midiInConsumer->IsValid()) {
 		fMidiPtrs->midiInConsumer->Release();
 		return false;
@@ -190,12 +190,12 @@ void QMidiIn::stop()
 	fMidiPtrs->midiInProducer->Disconnect(fMidiPtrs->midiInConsumer);
 }
 
-MidiInConsumer::MidiInConsumer(QMidiIn* midiIn, const char* name)
+QMidiInternal::MidiInConsumer::MidiInConsumer(QMidiIn* midiIn, const char* name)
 	: BMidiLocalConsumer(name), fMidiIn(midiIn)
 {
 }
 
-void MidiInConsumer::ChannelPressure(uchar channel, uchar pressure, bigtime_t time)
+void QMidiInternal::MidiInConsumer::ChannelPressure(uchar channel, uchar pressure, bigtime_t time)
 {
 	int data = 0xD0
 			| (channel & 0x0F)
@@ -203,7 +203,7 @@ void MidiInConsumer::ChannelPressure(uchar channel, uchar pressure, bigtime_t ti
 	emit(fMidiIn->midiEvent(static_cast<quint32>(data), time));
 }
 
-void MidiInConsumer::ControlChange(uchar channel, uchar controlNumber, uchar controlValue, bigtime_t time)
+void QMidiInternal::MidiInConsumer::ControlChange(uchar channel, uchar controlNumber, uchar controlValue, bigtime_t time)
 {
 	int data = 0xB0
 			| (channel & 0x0F)
@@ -212,7 +212,7 @@ void MidiInConsumer::ControlChange(uchar channel, uchar controlNumber, uchar con
 	emit(fMidiIn->midiEvent(static_cast<quint32>(data), time));
 }
 
-void MidiInConsumer::KeyPressure(uchar channel, uchar note, uchar pressure, bigtime_t time)
+void QMidiInternal::MidiInConsumer::KeyPressure(uchar channel, uchar note, uchar pressure, bigtime_t time)
 {
 	int data = 0xA0
 			| (channel & 0x0F)
@@ -221,7 +221,7 @@ void MidiInConsumer::KeyPressure(uchar channel, uchar note, uchar pressure, bigt
 	emit(fMidiIn->midiEvent(static_cast<quint32>(data), time));
 }
 
-void MidiInConsumer::NoteOff(uchar channel, uchar note, uchar velocity, bigtime_t time)
+void QMidiInternal::MidiInConsumer::NoteOff(uchar channel, uchar note, uchar velocity, bigtime_t time)
 {
 	int data = 0x80
 			| (channel & 0x0F)
@@ -230,7 +230,7 @@ void MidiInConsumer::NoteOff(uchar channel, uchar note, uchar velocity, bigtime_
 	emit(fMidiIn->midiEvent(static_cast<quint32>(data), time));
 }
 
-void MidiInConsumer::NoteOn(uchar channel, uchar note, uchar velocity, bigtime_t time)
+void QMidiInternal::MidiInConsumer::NoteOn(uchar channel, uchar note, uchar velocity, bigtime_t time)
 {
 	int data = 0x90
 			| (channel & 0x0F)
@@ -239,7 +239,7 @@ void MidiInConsumer::NoteOn(uchar channel, uchar note, uchar velocity, bigtime_t
 	emit(fMidiIn->midiEvent(static_cast<quint32>(data), time));
 }
 
-void MidiInConsumer::PitchBend(uchar channel, uchar lsb, uchar msb, bigtime_t time)
+void QMidiInternal::MidiInConsumer::PitchBend(uchar channel, uchar lsb, uchar msb, bigtime_t time)
 {
 	int data = 0xE0
 			| (channel & 0x0F)
@@ -248,7 +248,7 @@ void MidiInConsumer::PitchBend(uchar channel, uchar lsb, uchar msb, bigtime_t ti
 	emit(fMidiIn->midiEvent(static_cast<quint32>(data), time));
 }
 
-void MidiInConsumer::ProgramChange(uchar channel, uchar programNumber, bigtime_t time)
+void QMidiInternal::MidiInConsumer::ProgramChange(uchar channel, uchar programNumber, bigtime_t time)
 {
 	int data = 0xC0
 			| (channel & 0x0F)
@@ -256,7 +256,7 @@ void MidiInConsumer::ProgramChange(uchar channel, uchar programNumber, bigtime_t
 	emit(fMidiIn->midiEvent(static_cast<quint32>(data), time));
 }
 
-void MidiInConsumer::SystemExclusive(void* data, size_t length, bigtime_t time)
+void QMidiInternal::MidiInConsumer::SystemExclusive(void* data, size_t length, bigtime_t time)
 {
 	QByteArray ba = QByteArray(reinterpret_cast<const char*>(data), length);
 	ba.prepend('\xF0');

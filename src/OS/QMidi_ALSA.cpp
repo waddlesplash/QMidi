@@ -172,7 +172,7 @@ struct NativeMidiInInstances {
 	snd_seq_t* midiIn;
 
 	//! \brief receiveThread is a reference to the MIDI input receive thread.
-	MidiInReceiveThread* receiveThread;
+	QMidiInternal::MidiInReceiveThread* receiveThread;
 };
 
 QMap<QString, QString> QMidiIn::devices()
@@ -228,7 +228,7 @@ void QMidiIn::start()
 	if (!fConnected)
 		return;
 
-	fMidiPtrs->receiveThread = new MidiInReceiveThread(this, fMidiPtrs);
+	fMidiPtrs->receiveThread = new QMidiInternal::MidiInReceiveThread(this, fMidiPtrs);
 	fMidiPtrs->receiveThread->start();
 }
 
@@ -243,11 +243,11 @@ void QMidiIn::stop()
 	fMidiPtrs->receiveThread = nullptr;
 }
 
-MidiInReceiveThread::MidiInReceiveThread(QMidiIn* qMidiIn, NativeMidiInInstances* fMidiPtrs, QObject* parent)
+QMidiInternal::MidiInReceiveThread::MidiInReceiveThread(QMidiIn* qMidiIn, NativeMidiInInstances* fMidiPtrs, QObject* parent)
 	: QThread(parent), fMidiIn(qMidiIn), fMidiPtrs(fMidiPtrs)
 {}
 
-void MidiInReceiveThread::run()
+void QMidiInternal::MidiInReceiveThread::run()
 {
 	snd_seq_event_t* ev = nullptr;
 	int data = 0;

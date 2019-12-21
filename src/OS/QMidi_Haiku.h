@@ -8,6 +8,8 @@
 
 class QMidiIn;
 
+namespace QMidiInternal
+{
 class MidiInConsumer : public BMidiLocalConsumer
 {
 public:
@@ -25,3 +27,4 @@ public:
 private:
 	QMidiIn* fMidiIn;
 };
+}

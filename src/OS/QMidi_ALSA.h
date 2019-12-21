@@ -9,6 +9,8 @@
 class QMidiIn;
 struct NativeMidiInInstances;
 
+namespace QMidiInternal
+{
 //! \brief The MidiInReceiveThread class runs the ALSA MIDI input thread.  This
 //! is required since the function that reads input from a \c snd_seq_t handle
 //! blocks.
@@ -25,4 +27,5 @@ private:
 private:
 	QMidiIn* fMidiIn;
 	NativeMidiInInstances* fMidiPtrs;
+};
 };
