@@ -83,18 +83,37 @@ void QMidiOut::sendMsg(qint32 msg)
 	if (!fConnected)
 		return;
 
-	size_t bufferLength = 3;
-	char buf[3];
-	buf[0] = msg & 0xFF;
-	buf[1] = (msg >> 8) & 0xFF;
-	buf[2] = (msg >> 16) & 0xFF;
+	uchar command = msg & 0xF0;
+	uchar channel = msg & 0x0F;
+	uchar lsb = (msg >> 8) & 0xFF;
+	uchar msb = (msg >> 16) & 0xFF;
 
-	if (buf[0] == '\xC0' || buf[0] == '\xD0') {
-		// workaround for Haiku bug #15562
-		bufferLength = 2;
+	switch (command)
+	{
+	case 0x80:
+		fMidiPtrs->midiOutLocProd->SprayNoteOff(channel, lsb, msb);
+		break;
+	case 0x90:
+		fMidiPtrs->midiOutLocProd->SprayNoteOn(channel, lsb, msb);
+		break;
+	case 0xA0:
+		fMidiPtrs->midiOutLocProd->SprayKeyPressure(channel, lsb, msb);
+		break;
+	case 0xB0:
+		fMidiPtrs->midiOutLocProd->SprayControlChange(channel, lsb, msb);
+		break;
+	case 0xC0:
+		fMidiPtrs->midiOutLocProd->SprayProgramChange(channel, lsb);
+		break;
+	case 0xD0:
+		fMidiPtrs->midiOutLocProd->SprayChannelPressure(channel, lsb);
+		break;
+	case 0xE0:
+		fMidiPtrs->midiOutLocProd->SprayPitchBend(channel, lsb, msb);
+		break;
+	default:
+		qWarning("QMidiOut::sendMsg: unknown command %02x", command);
 	}
-
-	fMidiPtrs->midiOutLocProd->SprayData((void*)&buf, bufferLength, true);
 }
 
 void QMidiOut::sendSysEx(const QByteArray &data)
@@ -102,7 +121,15 @@ void QMidiOut::sendSysEx(const QByteArray &data)
 	if (!fConnected)
 		return;
 
-	fMidiPtrs->midiOutLocProd->SprayData((char*)data.data(), data.length(), false);
+	// SpraySystemExclusive expects the payload without the 0xF0 and 0xF7 markers only
+	if (!(data.front() == '\xF0' && data.back() == '\xF7')) {
+		qWarning("QMidiOut::sendSysEx: invalid SysEx data passed");
+		return;
+	}
+	char* payload = const_cast<char*>(data.constData()) + 1;
+	size_t payloadLength = data.length() - 2;
+
+	fMidiPtrs->midiOutLocProd->SpraySystemExclusive(payload, payloadLength);
 }
 
 // # pragma mark - QMidiIn
