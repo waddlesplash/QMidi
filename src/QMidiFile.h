@@ -37,7 +37,7 @@ public:
 	QMidiEvent();
 	~QMidiEvent();
 
-	inline EventType type() { return fType; }
+	inline EventType type() const { return fType; }
 	inline void setType(EventType newType) { fType = newType; }
 
 	inline qint32 tick() { return fTick; }
@@ -74,7 +74,7 @@ public:
 	inline int denominator() { return fDenominator; }
 	inline void setDenominator(int denominator) { fDenominator = denominator; }
 
-	inline QByteArray data() { return fData; }
+	inline QByteArray data() const { return fData; }
 	inline void setData(QByteArray data) { fData = data; }
 
 	quint32 message() const;

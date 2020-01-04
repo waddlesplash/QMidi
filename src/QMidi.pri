@@ -3,10 +3,12 @@ CONFIG += c++11
 
 INCLUDEPATH += $$PWD
 SOURCES += $$PWD/QMidiOut.cpp \
-	$$PWD/QMidiFile.cpp
+	$$PWD/QMidiFile.cpp \
+	$$PWD/QMidiIn.cpp
 
 HEADERS += $$PWD/QMidiOut.h \
-	$$PWD/QMidiFile.h
+	$$PWD/QMidiFile.h \
+	$$PWD/QMidiIn.h
 
 win32 {
 	LIBS += -lwinmm
@@ -16,9 +18,11 @@ win32 {
 linux* {
 	LIBS += -lasound
 	SOURCES += $$PWD/OS/QMidi_ALSA.cpp
+	HEADERS += $$PWD/OS/QMidi_ALSA.h
 }
 
 haiku* {
 	LIBS += -lmidi2
 	SOURCES += $$PWD/OS/QMidi_Haiku.cpp
+	HEADERS += $$PWD/OS/QMidi_Haiku.h
 }
