@@ -63,9 +63,7 @@ signals:
 	//! }
 	//! \endcode
 	//! \param message The received MIDI message.
-	//! \param timing Timing information provided by Win32 API.  This parameter
-	//! might be removed from the signal in a future version if it is not
-	//! provided by other platforms.
+	//! \param timing Timing information provided by operating system.
 	void midiEvent(quint32 message, quint32 timing);
 	//! \brief midiSysExEvent This signal is emitted when a MIDI System
 	//! Exclusive (SysEx) event is received.

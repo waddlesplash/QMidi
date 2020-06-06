@@ -26,3 +26,8 @@ haiku* {
 	SOURCES += $$PWD/OS/QMidi_Haiku.cpp
 	HEADERS += $$PWD/OS/QMidi_Haiku.h
 }
+
+macx* {
+	LIBS += -framework CoreMIDI -framework CoreFoundation -framework CoreAudio
+	SOURCES += $$PWD/OS/QMidi_CoreMidi.cpp
+}

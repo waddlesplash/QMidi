@@ -1,7 +1,7 @@
 # QMidi [![Build Status](https://travis-ci.org/waddlesplash/QMidi.png)](https://travis-ci.org/waddlesplash/QMidi)
 A simple, cross-platform way to support MIDI in Qt. MIDI Output and MIDI File I/O is supported.
-MIDI output is supported on Windows (Windows Multimedia), Linux (ALSA), and Haiku
-(Midi Kit 2).
+MIDI output is supported on Windows (Windows Multimedia), Linux (ALSA), Haiku
+(Midi Kit 2), and macOS (CoreMIDI).
 
 ## MIDI Output
 The `QMidiOut` class provides an interface to the system's MIDI Out.
