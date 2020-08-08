@@ -6,35 +6,34 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOMOC ON)
-set(BUILD_SHARED_LIBS ON)
 
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "C:\\Qt\\5.15.0\\msvc2019_64\\")
 
-find_package(Qt5 COMPONENTS Core Gui Widgets)
+find_package(Qt5 COMPONENTS Core)
 
 # Common QMidi source files
 set(SOURCES
-"${CMAKE_SOURCE_DIR}/src/QMidiOut.cpp"
-"${CMAKE_SOURCE_DIR}/src/QMidiFile.cpp"
-"${CMAKE_SOURCE_DIR}/src/QMidiIn.cpp"
+"${PROJECT_SOURCE_DIR}/src/QMidiOut.cpp"
+"${PROJECT_SOURCE_DIR}/src/QMidiFile.cpp"
+"${PROJECT_SOURCE_DIR}/src/QMidiIn.cpp"
 )
 
 # Platform specific QMidi source files
 if(WIN32)
     set(SOURCES ${SOURCES}
-        "${CMAKE_SOURCE_DIR}/src/OS/QMidi_Win32.cpp"
+        "${PROJECT_SOURCE_DIR}/src/OS/QMidi_Win32.cpp"
     )
 elseif(UNIX)
     set(SOURCES ${SOURCES}
-        "${CMAKE_SOURCE_DIR}/src/OS/QMidi_ALSA.cpp"
+        "${PROJECT_SOURCE_DIR}/src/OS/QMidi_ALSA.cpp"
     )
 elseif(HAIKU)
     set(SOURCES ${SOURCES}
-    "${CMAKE_SOURCE_DIR}/src/OS/QMidi_Haiku.cpp"
+    "${PROJECT_SOURCE_DIR}/src/OS/QMidi_Haiku.cpp"
     )
 elseif(APPLE)
     set(SOURCES ${SOURCES}
-        "${CMAKE_SOURCE_DIR}/src/OS/QMidi_CoreMidi.cpp"
+        "${PROJECT_SOURCE_DIR}/src/OS/QMidi_CoreMidi.cpp"
     )
 endif()
 
@@ -46,17 +45,31 @@ foreach(FILE ${SOURCES})
 endforeach()
 
 # Add library and specify where to look for headers & libraries
-add_library(${PROJECT_NAME} ${SOURCES})
-target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/src")
-target_link_libraries(${PROJECT_NAME} Qt5::Core Qt5::Gui Qt5::Widgets)
+add_library(${PROJECT_NAME} OBJECT ${SOURCES})
+set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE 1)
+target_include_directories(${PROJECT_NAME} PRIVATE 
+    "${PROJECT_SOURCE_DIR}/src"
+    ${Qt5Core_INCLUDE_DIRS}
+)
+
+set(LIBRARIES
+    Qt5::Core
+)
 
 # Platform specific MIDI libraries
 if(WIN32)
-    target_link_libraries(${PROJECT_NAME} winmm)
+    set(LIBRARIES ${LIBRARIES} winmm)
 elseif(UNIX)
-    target_link_libraries(${PROJECT_NAME} asound)
+    set(LIBRARIES ${LIBRARIES} asound)
 elseif(HAIKU)
-    target_link_libraries(${PROJECT_NAME} )
+    set(LIBRARIES ${LIBRARIES} midi2)
 elseif(APPLE)
-    target_link_libraries(${PROJECT_NAME} "-framework CoreMIDI" "-framework CoreFoundation" "-framework CoreAudio")
+    set(LIBRARIES ${LIBRARIES} "-framework CoreMIDI" "-framework CoreFoundation" "-framework CoreAudio")
 endif()
+
+# Link static and shared version
+add_library(${PROJECT_NAME}_shared SHARED $<TARGET_OBJECTS:${PROJECT_NAME}>)
+target_link_libraries(${PROJECT_NAME}_shared ${LIBRARIES})
+
+add_library(${PROJECT_NAME}_static STATIC $<TARGET_OBJECTS:${PROJECT_NAME}>)
+target_link_libraries(${PROJECT_NAME}_static ${LIBRARIES})
