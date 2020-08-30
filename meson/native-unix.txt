@@ -1,0 +1,4 @@
+[properties]
+platform_source_suffix = 'src/OS/QMidi_ALSA.cpp'
+platform_libs = ['asound']
+platform_moc_headers = ['src/OS/QMidi_ALSA.h']

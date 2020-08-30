@@ -1,0 +1,4 @@
+[properties]
+platform_source_suffix = 'src/OS/QMidi_Win32.cpp'
+platform_libs = ['winmm']
+platform_moc_headers = []
