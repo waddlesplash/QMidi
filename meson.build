@@ -3,7 +3,7 @@ project('QMidi', 'cpp')
 cppCompiler = meson.get_compiler('cpp')
 
 qt5 = import('qt5' )
-Qt5_dep = dependency('qt5', method: 'qmake', cmake_module_path: 'C:\\Qt\\5.15.0\\msvc2019_64', modules: ['Core'])
+Qt5_dep = dependency('qt5', modules: ['Core'])
 
 include_dir = include_directories('src/')
 
