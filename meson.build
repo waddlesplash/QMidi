@@ -13,17 +13,17 @@ dependencies = [Qt5_dep]
 
 # Platform specific QMidi source files & libraries
 if build_machine.system() == 'windows'
-  dependencies = [dependencies, cppCompiler.find_library('winmm')]
-  sources = [sources, 'src/OS/QMidi_Win32.cpp']
+  dependencies += cppCompiler.find_library('winmm')
+  sources += 'src/OS/QMidi_Win32.cpp'
 elif build_machine.system() == 'linux'
-  dependencies = [dependencies, cppCompiler.find_library('asound')]
-  sources = [sources, 'src/OS/QMidi_ALSA.cpp', qt5.preprocess(moc_headers: ['src/OS/QMidi_ALSA.h'], include_directories: include_dir, dependencies: Qt5_dep)]
+  dependencies += cppCompiler.find_library('asound')
+  sources += ['src/OS/QMidi_ALSA.cpp', qt5.preprocess(moc_headers: ['src/OS/QMidi_ALSA.h'], include_directories: include_dir, dependencies: Qt5_dep)]
 elif build_machine.system() == 'haiku'
-  dependencies = [dependencies, cppCompiler.find_library('midi2')]
-  sources = [sources, 'src/OS/QMidi_Haiku.cpp']
+  dependencies += cppCompiler.find_library('midi2')
+  sources += 'src/OS/QMidi_Haiku.cpp'
 elif build_machine.system() == 'darwin'
-  dependencies = [dependencies, cppCompiler.find_library('-framework CoreMIDI'), cppCompiler.find_library('-framework CoreFoundation'), cppCompiler.find_library('-framework CoreAudio')]
-  sources = [sources, 'src/OS/QMidi_CoreMidi.cpp']
+  dependencies += [cppCompiler.find_library('-framework CoreMIDI'), cppCompiler.find_library('-framework CoreFoundation'), cppCompiler.find_library('-framework CoreAudio')]
+  sources += 'src/OS/QMidi_CoreMidi.cpp'
 endif
 
 # Add library
