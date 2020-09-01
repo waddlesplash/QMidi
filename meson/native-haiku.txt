@@ -1,4 +1,0 @@
-[properties]
-platform_source_suffix = 'src/OS/QMidi_Haiku.cpp'
-platform_libs = ['midi2']
-platform_moc_headers = []
