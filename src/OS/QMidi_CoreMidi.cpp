@@ -8,7 +8,6 @@
 #include <CoreAudio/HostTime.h>
 #include <CoreServices/CoreServices.h>
 #include <CoreMIDI/CoreMIDI.h>
-#include <cstdio>
 
 // # pragma mark - QMidiOut
 
