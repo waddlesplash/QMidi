@@ -44,10 +44,11 @@ void QMidiOut::noteOn(int note, int voice, int velocity)
 	sendMsg(msg);
 }
 
-void QMidiOut::noteOff(int note, int voice)
+void QMidiOut::noteOff(int note, int voice, int velocity)
 {
 	qint32 msg = 0x80 + voice;
 	msg |= note << 8;
+	msg |= velocity << 16;
 	sendMsg(msg);
 }
 
