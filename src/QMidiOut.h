@@ -27,7 +27,7 @@ public:
 	void sendEvent(const QMidiEvent& e);
 	void setInstrument(int voice, int instr);
 	void noteOn(int note, int voice, int velocity = 64);
-	void noteOff(int note, int voice);
+	void noteOff(int note, int voice, int velocity = 0);
 	void pitchWheel(int voice, int value);
 	void channelAftertouch(int voice, int value);
 	void polyphonicAftertouch(int note, int voice, int value);

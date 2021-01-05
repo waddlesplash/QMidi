@@ -115,7 +115,7 @@ void QMidiOut::sendMsg(qint32 msg)
 
 	MIDITimeStamp timeStamp = AudioGetCurrentHostTime();
 	packet = MIDIPacketListAdd(&packetList, sizeof(packetList), packet,
-		timeStamp, sizeof(msg), (Byte *)msg);
+		timeStamp, sizeof(msg), (Byte*)&msg);
 
 	MIDISend(fMidiPtrs->outputPort, fMidiPtrs->destinationId, &packetList);
 }

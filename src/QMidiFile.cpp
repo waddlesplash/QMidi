@@ -38,8 +38,8 @@ quint32 QMidiEvent::message() const
 	case NoteOff:
 		u.data_as_bytes[0] = 0x80 | fVoice;
 		u.data_as_bytes[1] = fNote;
-		u.data_as_bytes[2] = 0;
-		u.data_as_bytes[3] = 0;
+		u.data_as_bytes[2] = fVelocity;
+		u.data_as_bytes[3] = 0; 
 		break;
 
 	case NoteOn:
