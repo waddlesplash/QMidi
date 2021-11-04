@@ -7,11 +7,12 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOMOC ON)
 
-find_package(Qt5 COMPONENTS Core)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
+#find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core REQUIRED)
 
 # Common QMidi source files & library
 aux_source_directory("${PROJECT_SOURCE_DIR}/src" SOURCES)
-set(LIBRARIES Qt5::Core)
+set(LIBRARIES Qt${QT_VERSION_MAJOR}::Core)
 
 # Platform specific QMidi source files & libraries
 if(WIN32)
@@ -30,5 +31,5 @@ endif()
 
 # Add library
 add_library(${PROJECT_NAME} ${SOURCES})
-target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/src" ${Qt5Core_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/src")
 target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
