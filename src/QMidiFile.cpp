@@ -236,8 +236,8 @@ void QMidiFile::sort()
 	if (fDisableSort) {
 		return;
 	}
-    std::stable_sort(fEvents.begin(), fEvents.end(), isGreaterThan);
-    std::stable_sort(fTempoEvents.begin(), fTempoEvents.end(), isGreaterThan);
+	std::stable_sort(fEvents.begin(), fEvents.end(), isGreaterThan);
+	std::stable_sort(fTempoEvents.begin(), fTempoEvents.end(), isGreaterThan);
 }
 
 void QMidiFile::addEvent(qint32 tick, QMidiEvent* e)
