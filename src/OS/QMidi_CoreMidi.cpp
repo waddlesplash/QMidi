@@ -147,21 +147,27 @@ struct NativeMidiInInstances {
 static void QMidiInReadProc(const MIDIPacketList *list, void *readProc,
 	void *srcConn)
 {
+	Q_UNUSED(srcConn)
 	QMidiIn *midiIn = static_cast<QMidiIn *>(readProc);
 	MIDIPacket *packet = const_cast<MIDIPacket *>(list->packet);
 
 	for (UInt32 index = 0; index < list->numPackets; index++) {
 		UInt16 byteCount = packet->length;
 
-		// Check that the MIDIPacket has data, and is a normal midi
-		// message. (We don't support Sysex, status, etc for CoreMIDI at
-		// the moment.)
-		if (byteCount != 0
-			&& packet->data[0] < 0xF0
-			&& (packet->data[0] & 0x80) != 0x00) {
-			emit(midiIn->midiEvent(*packet->data,
-				packet->timeStamp));
-	    	}
+		// Check that MIDIPacket has data in 3-byte groups
+		if (byteCount != 0 && (byteCount % 3) == 0) {
+			// We need to break apart the data into 3-byte messages
+			for (int i = 0; i < byteCount; i += 3) {
+				// Make sure that it's a normal MIDI message. SysEx etc.
+				// are not supported at the moment.
+				if ((packet->data[i] < 0xF0) && (packet->data[i] & 0x80)) {
+					quint32 const msg =   (packet->data[i]) 
+										| (packet->data[i + 1] << 8)
+										| (packet->data[i + 2] << 16);
+					emit midiIn->midiEvent(msg, packet->timeStamp);
+				}
+			}
+    	}
 
 		packet = MIDIPacketNext(packet);
 	}
