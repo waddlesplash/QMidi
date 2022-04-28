@@ -155,15 +155,12 @@ static void QMidiInReadProc(const MIDIPacketList *list, void *readProc,
 		UInt16 byteCount = packet->length;
 
 		// Check that MIDIPacket has data in 3-byte groups
-		if (byteCount != 0 && byteCount % 3 == 0)
-		{
+		if (byteCount != 0 && (byteCount % 3) == 0) {
 			// We need to break apart the data into 3-byte messages
 			for (int i = 0; i < byteCount; i += 3) {
-				// Make sure that it's a normal MIDI message. SysSex etc.
+				// Make sure that it's a normal MIDI message. SysEx etc.
 				// are not supported at the moment.
-				if (packet->data[i] < 0xF0
-				&& (packet->data[i] & 0x80) != 0x00)
-				{
+				if ((packet->data[i] < 0xF0) && (packet->data[i] & 0x80)) {
 					quint32 const msg =   (packet->data[i]) 
 										| (packet->data[i + 1] << 8)
 										| (packet->data[i + 2] << 16);
