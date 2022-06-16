@@ -8,7 +8,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOMOC ON)
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
-#find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core REQUIRED)
 
 # Common QMidi source files & library
 aux_source_directory("${PROJECT_SOURCE_DIR}/src" SOURCES)
